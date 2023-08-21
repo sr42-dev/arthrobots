@@ -109,7 +109,7 @@ class A2C:
         self.actor_opt, self.critic_opt = self.set_model_opt(self.actor_loss, self.critic_loss,
                                                              self.actor_lr, self.critic_lr)
 
-    # acctor network
+    # actor network
     def actor_net(self, state, nb_actions, name, reuse=False, training=True, use_layer_norm=True):
         with tf.compat.v1.variable_scope(name, reuse=reuse):
             x = tf.keras.layers.Dense(130)(state)
