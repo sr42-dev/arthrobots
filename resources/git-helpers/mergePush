@@ -1,0 +1,10 @@
+mergePush() 
+{
+    cur_branch = $(git rev-parse --abbrev-ref HEAD)
+    git pull
+    git checkout master
+    git merge $cur_branch
+    git push -u origin $cur_branch:master
+}
+
+mergePush

@@ -1,0 +1,22 @@
+updated gitignore
+on master
+
+next immediate items (publish to test after each item) :
+- duplicate repo and privatize with new commit guidelines
+- implement q learning on single arthrobot simulation
+- implement dreamerv3 on single arthrobot simulation
+- build and test hardware with dreamerv3 (off-repo)
+- allocate gpu resources
+- federate best model
+
+long term milestones (publish to main after each item) :
+- survey of walking RL algorithms <
+- dreamerv3 on arthrobot
+- walking to different goals using discrete mapping
+- survey on federation methods for dreamer
+- best type of federation in LFRL for legged robots
+- improving path planning using RL (FRedBots inspired)
+- improving scheduling from alica and optimized with RL
+- dynamic multi-agent obstacle avoidance methods (when agents become obstacles for one another)
+- Arthrobots : Adaptive swarms
+
