@@ -1,2 +1,2 @@
-git log --all --decorate --oneline --graph >> lasttree.txt
+git log --all --decorate --oneline --graph 
 
