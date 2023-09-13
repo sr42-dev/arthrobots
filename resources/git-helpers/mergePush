@@ -2,9 +2,9 @@ mergePush()
 {
     cur_branch = $(git rev-parse --abbrev-ref HEAD)
     git pull
-    git checkout master
+    git checkout test
     git merge $cur_branch
-    git push -u origin $cur_branch:master
+    git push -u origin $cur_branch:test
 }
 
 mergePush
