@@ -1,10 +1,11 @@
-updated gitignore
+test ready to be committed to
 on master
 
 next immediate items (publish to test after each item) :
-- duplicate repo and privatize with new commit guidelines
 - implement q learning on single arthrobot simulation
 - implement dreamerv3 on single arthrobot simulation
+- plot rewards vs episodes for all methods
+- implement model saving and deployment for all methods
 - build and test hardware with dreamerv3 (off-repo)
 - allocate gpu resources
 - federate best model
