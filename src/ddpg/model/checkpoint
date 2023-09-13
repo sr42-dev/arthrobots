@@ -1,0 +1,2 @@
+model_checkpoint_path: "/home/sr42/catkin_ws/src/arthrobots/src/ddpg/model/model.ckpt"
+all_model_checkpoint_paths: "/home/sr42/catkin_ws/src/arthrobots/src/ddpg/model/model.ckpt"
