@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+  <!-- Specify the base path for URDF models -->
+  <arg name="urdf_base_path" default="$(find quadruped)/" />
+
+  <!-- Arguments for robot descriptions -->
+  <arg name="robot1_model" default="$(arg urdf_base_path)/urdf_1/quadruped_model.xacro" />
+  <arg name="robot2_model" default="$(arg urdf_base_path)/urdf_2/quadruped_model.xacro" />
+  <arg name="robot3_model" default="$(arg urdf_base_path)/urdf_3/quadruped_model.xacro" />
+  <arg name="robot4_model" default="$(arg urdf_base_path)/urdf_4/quadruped_model.xacro" />
+
+  <!-- Launch Gazebo World -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(find quadruped)/worlds/quadruped.world"/>
+    <arg name="debug" value="false" />
+    <arg name="gui" value="true" />
+    <arg name="paused" value="false"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="headless" value="false"/>
+  </include>
+
+  <!-- Load robot descriptions -->
+  <param name="robot_description_Robot1" command="$(find xacro)/xacro --inorder $(arg robot1_model)" />
+  <param name="robot_description_Robot2" command="$(find xacro)/xacro --inorder $(arg robot2_model)" />
+  <param name="robot_description_Robot3" command="$(find xacro)/xacro --inorder $(arg robot3_model)" />
+  <param name="robot_description_Robot4" command="$(find xacro)/xacro --inorder $(arg robot4_model)" />
+
+  <!-- Launch URDF models for each robot -->
+  <group ns="robot1">
+    <include file="$(find quadruped)/launch/simulation/one_robot.launch">
+            <arg name="robot_name" value="robot1" />
+            <arg name="model" value="$(arg robot1_model)" />
+            <arg name="init_pose" value="-x 1 -y 1 -z 0" />
+
+    </include>
+  </group>
+
+  <group ns="robot2">
+        <include file="$(find quadruped)/launch/simulation/one_robot.launch">
+            <arg name="robot_name" value="robot2" />
+            <arg name="model" value="$(arg robot2_model)" />
+            <arg name="init_pose" value="-x 1 -y 3 -z 0" />
+
+    </include>
+  </group>
+
+  <group ns="robot3">
+        <include file="$(find quadruped)/launch/simulation/one_robot.launch">
+
+            <arg name="robot_name" value="robot3" />
+            <arg name="model" value="$(arg robot3_model)" />
+            <arg name="init_pose" value="-x 3 -y 1 -z 0" />
+
+    </include>
+  </group>
+
+  <group ns="robot4">
+        <include file="$(find quadruped)/launch/simulation/one_robot.launch">
+
+            <arg name="robot_name" value="robot4" />
+            <arg name="model" value="$(arg robot4_model)" />
+            <arg name="init_pose" value="-x 3 -y 4 -z 0" />
+
+    </include>
+  </group>
+</launch>
