@@ -1,0 +1,27 @@
+<launch>
+  <!-- Arguments -->
+  <arg name="robot_name" />
+  <arg name="model" default="" />  <!-- This will be set in multi_robot.launch -->
+  <arg name="init_pose" />
+  <arg name="joint_controller_parent" />
+
+  <!-- Load the URDF model -->
+  <param name="robot_description" command="$(find xacro)/xacro $(arg model)" />
+
+  <!-- Spawn the URDF model in Gazebo -->
+  <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model"
+    args="-param robot_description -urdf -model $(arg robot_name)" respawn="false" output="screen" />
+
+  <!-- Load controller configurations -->
+  <rosparam command="load" file="$(find quadruped)/config/quadruped_control.yaml" ns="$(arg robot_name)"/>
+
+  <!-- Spawn joint_trajectory_controller -->
+  <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
+    output="screen" ns="/$(arg robot_name)" args="joint_trajectory_controller"/>
+
+  <!-- Publish robot's joint states -->
+  <node pkg="robot_state_publisher" type="robot_state_publisher"  name="robot_state_publisher" respawn="false" output="screen">
+    <remap from="/joint_states" to="/$(arg robot_name)/joint_states" />
+    <param name="publish_frequency" type="double" value="60.0" />
+  </node>
+</launch>

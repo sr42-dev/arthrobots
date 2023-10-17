@@ -114,6 +114,10 @@ class DQN:
         """
         Takes a state from the game environment and returns an action that
         has the highest Q value and should be taken as the next step.
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/multi_spawn
         :param state: the current game environment state
         :return: an action
         """
@@ -121,6 +125,10 @@ class DQN:
         action_q = self.q_net(state_input)
         action = action_q.numpy()[0]
         return action
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/multi_spawn
     def update_target_network(self):
         """
         Updates the current target_q_net with the q_net which brings all the

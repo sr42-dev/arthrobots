@@ -50,7 +50,11 @@ class AllJoints:
         point.accelerations = self.jtp_zeros
         point.effort = self.jtp_zeros
         point.time_from_start = rospy.Duration(1.0/60.0)
+<<<<<<< HEAD
         jtp_msg.points.append(point) 
+=======
+        jtp_msg.points.append(point)
+>>>>>>> origin/multi_spawn
         self.jtp.publish(jtp_msg)
 
     # reset move to position movement
