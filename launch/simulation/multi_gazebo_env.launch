@@ -20,10 +20,10 @@
   </include>
 
   <!-- Load robot descriptions -->
-  <param name="robot_description_Robot1" command="$(find xacro)/xacro --inorder $(arg robot1_model)" />
-  <param name="robot_description_Robot2" command="$(find xacro)/xacro --inorder $(arg robot2_model)" />
-  <param name="robot_description_Robot3" command="$(find xacro)/xacro --inorder $(arg robot3_model)" />
-  <param name="robot_description_Robot4" command="$(find xacro)/xacro --inorder $(arg robot4_model)" />
+  <param name="robot_description_Robot1" command="$(find xacro)/xacro  $(arg robot1_model)" />
+  <param name="robot_description_Robot2" command="$(find xacro)/xacro  $(arg robot2_model)" />
+  <param name="robot_description_Robot3" command="$(find xacro)/xacro  $(arg robot3_model)" />
+  <param name="robot_description_Robot4" command="$(find xacro)/xacro  $(arg robot4_model)" />
 
   <!-- Launch URDF models for each robot -->
   <group ns="robot1">
