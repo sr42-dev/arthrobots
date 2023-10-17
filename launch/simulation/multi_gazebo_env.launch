@@ -28,6 +28,8 @@
   <!-- Launch URDF models for each robot -->
   <group ns="robot1">
     <include file="$(find quadruped)/launch/simulation/one_robot.launch">
+            <param name="tf_prefix" value="robot1_tf" />
+
             <arg name="robot_name" value="robot1" />
             <arg name="model" value="$(arg robot1_model)" />
             <arg name="init_pose" value="-x 1 -y 1 -z 0" />
@@ -37,6 +39,8 @@
 
   <group ns="robot2">
         <include file="$(find quadruped)/launch/simulation/one_robot.launch">
+            <param name="tf_prefix" value="robot2_tf" />
+
             <arg name="robot_name" value="robot2" />
             <arg name="model" value="$(arg robot2_model)" />
             <arg name="init_pose" value="-x 1 -y 3 -z 0" />
@@ -46,6 +50,7 @@
 
   <group ns="robot3">
         <include file="$(find quadruped)/launch/simulation/one_robot.launch">
+            <param name="tf_prefix" value="robot3_tf" />
 
             <arg name="robot_name" value="robot3" />
             <arg name="model" value="$(arg robot3_model)" />
@@ -56,6 +61,7 @@
 
   <group ns="robot4">
         <include file="$(find quadruped)/launch/simulation/one_robot.launch">
+            <param name="tf_prefix" value="robot4_tf" />
 
             <arg name="robot_name" value="robot4" />
             <arg name="model" value="$(arg robot4_model)" />
