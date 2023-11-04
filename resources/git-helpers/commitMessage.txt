@@ -1,7 +1,7 @@
-test ready to be committed to
-on master
+Saving progress, modified worldmodels file structure (unrelated)  
+on qlearning_devel
 
-next immediate items (publish to test after each item) :
+next immediate items (  to test after each item) :
 - implement q learning on single arthrobot simulation
 - implement dreamerv3 on single arthrobot simulation
 - plot rewards vs episodes for all methods
