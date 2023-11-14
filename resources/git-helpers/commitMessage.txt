@@ -1,9 +1,8 @@
-qlearning running, parameter tuning required
-close #1
-on qlearning_devel
+file restructuring
+on test
 
 next immediate items (to test after each item) :
-- implement q learning on single arthrobot simulation
+- implement q learning on single arthrobot simulation [DONE]
 - implement dreamerv3 on single arthrobot simulation (start with gym-environment file structure)
 - plot rewards vs episodes for all methods
 - implement model saving and deployment for all methods
