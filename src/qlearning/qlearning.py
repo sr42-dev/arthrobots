@@ -1,623 +1,227 @@
-import sys
-sys.path.append("..")
+import random
 import numpy as np
-# from env.grid_world import GridWorld
-# from algorithms.temporal_difference import qlearning
-# from utils.plots import plot_gridworld
-np.random.seed(1)
+import tensorflow as tf
+from collections import deque
+from tensorflow.python.keras import Sequential
+from tensorflow.python.keras.layers import Dense
 
 
-# from utils.helper_functions import row_col_to_seq
-# from utils.helper_functions import seq_to_col_row
-from math import floor
-import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.patches as patches
-# from utils.helper_functions import create_policy_direction_arrays
-
-def add_policy(model, policy):
-
-    if policy is not None:
-        # define the gridworld
-        X = np.arange(0, model.num_cols, 1)
-        Y = np.arange(0, model.num_rows, 1)
-
-        # define the policy direction arrows
-        U, V = create_policy_direction_arrays(model, policy)
-        # remove the obstructions and final state arrows
-        ra = model.goal_states
-        U[ra[:, 0], ra[:, 1]] = np.nan
-        V[ra[:, 0], ra[:, 1]] = np.nan
-        if model.obs_states is not None:
-            ra = model.obs_states
-            U[ra[:, 0], ra[:, 1]] = np.nan
-            V[ra[:, 0], ra[:, 1]] = np.nan
-        if model.restart_states is not None:
-            ra = model.restart_states
-            U[ra[:, 0], ra[:, 1]] = np.nan
-            V[ra[:, 0], ra[:, 1]] = np.nan
-
-        plt.quiver(X, Y, U, V, zorder=10, label="Policy")
-
-def row_col_to_seq(row_col, num_cols):
-    return row_col[:,0] * num_cols + row_col[:,1]
-
-def seq_to_col_row(seq, num_cols):
-    r = floor(seq / num_cols)
-    c = seq - r * num_cols
-    return np.array([[r, c]])
-
-def create_policy_direction_arrays(model, policy):
+class ReplayBuffer:
     """
-     define the policy directions
-     0 - up    [0, 1]
-     1 - down  [0, -1]
-     2 - left  [-1, 0]
-     3 - right [1, 0]
-    :param policy:
-    :return:
-    """
-    # action options
-    UP = 0
-    DOWN = 1
-    LEFT = 2
-    RIGHT = 3
+    Replay Buffer
 
-    # intitialize direction arrays
-    U = np.zeros((model.num_rows, model.num_cols))
-    V = np.zeros((model.num_rows, model.num_cols))
-
-    for state in range(model.num_states-1):
-        # get index of the state
-        i = tuple(seq_to_col_row(state, model.num_cols)[0])
-        # define the arrow direction
-        if policy[state] == UP:
-            U[i] = 0
-            V[i] = 0.5
-        elif policy[state] == DOWN:
-            U[i] = 0
-            V[i] = -0.5
-        elif policy[state] == LEFT:
-            U[i] = -0.5
-            V[i] = 0
-        elif policy[state] == RIGHT:
-            U[i] = 0.5
-            V[i] = 0
-
-    return U, V
-
-
-def plot_gridworld(model, value_function=None, policy=None, state_counts=None, title=None, path=None):
-    """
-    Plots the grid world solution.
-
-    Parameters
-    ----------
-    model : python object
-        Holds information about the environment to solve
-        such as the reward structure and the transition dynamics.
-
-    value_function : numpy array of shape (N, 1)
-        Value function of the environment where N is the number
-        of states in the environment.
-
-    policy : numpy array of shape (N, 1)
-        Optimal policy of the environment.
-
-    title : string
-        Title of the plot. Defaults to None.
-
-    path : string
-        Path to save image. Defaults to None.
+    Stores and retrieves gameplay experiences
     """
 
-    if value_function is not None and state_counts is not None:
-        raise Exception("Must supple either value function or state_counts, not both!")
+    def __init__(self):
+        self.gameplay_experiences = deque(maxlen=1000000)
 
-    fig, ax = plt.subplots()
-
-    # add features to grid world
-    if value_function is not None:
-        add_value_function(model, value_function, "Value function")
-    elif state_counts is not None:
-        add_value_function(model, state_counts, "State counts")
-    elif value_function is None and state_counts is None:
-        add_value_function(model, value_function, "Value function")
-
-    add_patches(model, ax)
-    add_policy(model, policy)
-
-    plt.legend(loc='upper center', bbox_to_anchor=(0.5, -0.12),
-               fancybox=True, shadow=True, ncol=3)
-    if title is not None:
-        plt.title(title, fontdict=None, loc='center')
-    if path is not None:
-        plt.savefig(path, dpi=300, bbox_inches='tight')
-
-    plt.show()
-
-def add_value_function(model, value_function, name):
-
-    if value_function is not None:
-        # colobar max and min
-        vmin = np.min(value_function)
-        vmax = np.max(value_function)
-        # reshape and set obstructed states to low value
-        val = value_function[:-1, 0].reshape(model.num_rows, model.num_cols)
-        if model.obs_states is not None:
-            index = model.obs_states
-            val[index[:, 0], index[:, 1]] = -100
-        plt.imshow(val, vmin=vmin, vmax=vmax, zorder=0)
-        plt.colorbar(label=name)
-    else:
-        val = np.zeros((model.num_rows, model.num_cols))
-        plt.imshow(val, zorder=0)
-        plt.yticks(np.arange(-0.5, model.num_rows+0.5, step=1))
-        plt.xticks(np.arange(-0.5, model.num_cols+0.5, step=1))
-        plt.grid()
-        plt.colorbar(label=name)
-
-def add_patches(model, ax):
-
-    start = patches.Circle(tuple(np.flip(model.start_state[0])), 0.2, linewidth=1,
-                           edgecolor='b', facecolor='b', zorder=1, label="Start")
-    ax.add_patch(start)
-
-    for i in range(model.goal_states.shape[0]):
-        end = patches.RegularPolygon(tuple(np.flip(model.goal_states[i, :])), numVertices=5,
-                                     radius=0.25, orientation=np.pi, edgecolor='g', zorder=1,
-                                     facecolor='g', label="Goal" if i == 0 else None)
-        ax.add_patch(end)
-
-    # obstructed states patches
-    if model.obs_states is not None:
-        for i in range(model.obs_states.shape[0]):
-            obstructed = patches.Rectangle(tuple(np.flip(model.obs_states[i, :]) - 0.35), 0.7, 0.7,
-                                           linewidth=1, edgecolor='orange', facecolor='orange', zorder=1,
-                                           label="Obstructed" if i == 0 else None)
-            ax.add_patch(obstructed)
-
-    if model.bad_states is not None:
-        for i in range(model.bad_states.shape[0]):
-            bad = patches.Wedge(tuple(np.flip(model.bad_states[i, :])), 0.2, 40, -40,
-                                linewidth=1, edgecolor='r', facecolor='r', zorder=1,
-                                label="Bad state" if i == 0 else None)
-            ax.add_patch(bad)
-
-    if model.restart_states is not None:
-        for i in range(model.restart_states.shape[0]):
-            restart = patches.Wedge(tuple(np.flip(model.restart_states[i, :])), 0.2, 40, -40,
-                                    linewidth=1, edgecolor='y', facecolor='y', zorder=1,
-                                    label="Restart state" if i == 0 else None)
-            ax.add_patch(restart)
-
-
-
-
-
-class GridWorld:
-    """
-    Creates a gridworld object to pass to an RL algorithm.
-
-    Parameters
-    ----------
-    num_rows : int
-        The number of rows in the gridworld.
-
-    num_cols : int
-        The number of cols in the gridworld.
-
-    start_state : numpy array of shape (1, 2), np.array([[row, col]])
-        The start state of the gridworld (can only be one start state)
-
-    goal_states : numpy arrany of shape (n, 2)
-        The goal states for the gridworld where n is the number of goal
-        states.
-    """
-    def __init__(self, num_rows, num_cols, start_state, goal_states):
-        self.num_rows = num_rows
-        self.num_cols = num_cols
-        self.start_state = start_state
-        self.goal_states = goal_states
-        self.obs_states = None
-        self.bad_states = None
-        self.num_bad_states = 0
-        self.p_good_trans = None
-        self.bias = None
-        self.r_step = None
-        self.r_goal = None
-        self.r_dead = None
-        self.gamma = 1 # default is no discounting
-
-    def add_obstructions(self, obstructed_states=None, bad_states=None, restart_states=None):
+    def store_gameplay_experience(self, state, next_state, reward, action,
+                                  done):
         """
-        Add obstructions to the grid world.
+        Records a single step (state transition) of gameplay experience.
 
-        Obstructed states: walls that prohibit the agent from entering that state.
-
-        Bad states: states that incur a greater penalty than a normal step.
-
-        Restart states: states that incur a high penalty and transition the agent
-                        back to the start state (but do not end the episode).
-
-        Parameters
-        ----------
-        obstructed_states : numpy array of shape (n, 2)
-            States the agent cannot enter where n is the number of obstructed states
-            and the two columns are the row and col position of the obstructed state.
-
-        bad_states: numpy array of shape (n, 2)
-            States in which the agent incurs high penalty where n is the number of bad
-            states and the two columns are the row and col position of the bad state.
-
-        restart_states: numpy array of shape (n, 2)
-            States in which the agent incurs high penalty and transitions to the start
-            state where n is the number of restart states and the two columns are the
-            row and col position of the restart state.
+        :param state: the current game state
+        :param next_state: the game state after taking action
+        :param reward: the reward taking action at the current state brings
+        :param action: the action taken at the current state
+        :param done: a boolean indicating if the game is finished after
+        taking the action
+        :return: None
         """
-        self.obs_states = obstructed_states
-        self.bad_states = bad_states
-        if bad_states is not None:
-            self.num_bad_states = bad_states.shape[0]
+        self.gameplay_experiences.append((state, next_state, reward, action,
+                                          done))
+
+    def sample_gameplay_batch(self):
+        """
+        Samples a batch of gameplay experiences for training.
+
+        :return: a list of gameplay experiences
+        """
+        batch_size = min(128, len(self.gameplay_experiences))
+        sampled_gameplay_batch = random.sample(
+            self.gameplay_experiences, batch_size)
+        state_batch = []
+        next_state_batch = []
+        action_batch = []
+        reward_batch = []
+        done_batch = []
+        for gameplay_experience in sampled_gameplay_batch:
+            state_batch.append(gameplay_experience[0])
+            next_state_batch.append(gameplay_experience[1])
+            reward_batch.append(gameplay_experience[2])
+            action_batch.append(gameplay_experience[3])
+            done_batch.append(gameplay_experience[4])
+        return np.array(state_batch), np.array(next_state_batch), np.array(
+            action_batch), np.array(reward_batch), np.array(done_batch)
+
+
+class QL:
+    """
+    QL Agent
+
+    The agent that explores the game and learn how to play the game by generating the Q value given a state-action pair according to a set rule.
+    """
+    def __init__(self, epsilon, alpha, gamma):
+        self.q = {}             # Q table
+        self.epsilon = epsilon  # exploration constant
+        self.alpha = alpha      # discount constant
+        self.gamma = gamma      # discount factor
+        self.actions = []       # all possible actions
+
+    def getQ(self, state, action):
+        return self.q.get(str((state, action)), 0.0)
+
+    def learnQ(self, state, action, reward, value):
+        '''
+        Q-learning:
+            Q(s, a) += alpha * (reward(s,a) + max(Q(s') - Q(s,a))            
+        '''
+        # pre-process states with approximate values
+        decs = 2
+        state = state.round(decimals=2) # truncating all state values to two decimals
+        # randact = np.random.random_sample(12,)
+        action = action.round(decimals=2) # truncating random action values to two decimals
+        self.actions.append(action)
+
+        oldv = self.q.get(str((state, action)), None)
+        if oldv is None:
+            self.q[str((state, action))] = reward
         else:
-            self.num_bad_states = 0
-        self.restart_states = restart_states
-        if restart_states is not None:
-            self.num_restart_states = restart_states.shape[0]
+            self.q[str((state, action))] = oldv + self.alpha * (value - oldv)
+
+    def chooseAction(self, state, return_q=False):
+
+        # pre-process states with approximate values
+        decs = 2
+        state = state.round(decimals=2) # truncating all state values to two decimals
+        randact = np.random.random_sample(12,)
+        randact = randact.round(decimals=2) # truncating random action values to two decimals
+
+        if not np.any(np.all(randact == self.actions)):
+            self.actions.append(randact) # appending a random action to the action space to facilitate exploration
+
+        q = [self.getQ(state, a) for a in self.actions] 
+        maxQ = max(q)
+
+        if random.random() < self.epsilon:
+            minQ = min(q); mag = max(abs(minQ), abs(maxQ))
+            # add random values to all the actions, recalculate maxQ
+            q = [q[i] + random.random() * mag - .5 * mag for i in range(len(self.actions))] 
+            maxQ = max(q)
+
+        count = q.count(maxQ)
+        # In case there're several state-action max values 
+        # we select a random one among them
+        if count > 1:
+            best = [i for i in range(len(self.actions)) if q[i] == maxQ]
+            i = random.choice(best)
+
         else:
-            self.num_restart_states = 0
+            i = q.index(maxQ)
 
-    def add_transition_probability(self, p_good_transition, bias):
+        action = self.actions[i]        
+        if return_q: # if they want it, give it 
+            return action, q
+        return action
+
+    def learn(self, state1, action1, reward, state2):
+        decs = 2
+        state1 = state1.round(decimals=2) # truncating all state values to two decimals
+        state2 = state2.round(decimals=2) # truncating all state values to two decimals
+        action1 = action1.round(decimals=2) # truncating all action values to two decimals
+
+        maxqnew = max([self.getQ(state2, a) for a in self.actions])
+        self.learnQ(state1, action1, reward, reward + self.gamma*maxqnew)
+
+    '''
+
+    def __init__(self, state_shape, action_shape):
+
+        self.state_shape = state_shape[0] # collects the first argument from the state shape tuple
+        self.action_shape = action_shape[0] # collects the first argument from the action shape tuple
+
+        self.q_net = self._build_dqn_model()
+        self.target_q_net = self._build_dqn_model()
+
+    def _build_dqn_model(self):
         """
-        Add transition probabilities to the grid world.
+        Builds a deep neural net which predicts the Q values for all possible
+        actions given a state. The input should have the shape of the state, and
+        the output should have the same shape as the action space since we want
+        1 Q value per possible action.
 
-        p_good_transition is the probability that the agent successfully
-        executes the intended action. The action is then incorrectly executed
-        with probability 1 - p_good_transition and in tis case the agent
-        transitions to the left of the intended transition with probability
-        (1 - p_good_transition) * bias and to the right with probability
-        (1 - p_good_transition) * (1 - bias).
-
-        Parameters
-        ----------
-        p_good_transition : float (in the interval [0,1])
-             The probability that the agents attempted transition is successful.
-
-        bias : float (in the interval [0,1])
-            The probability that the agent transitions left or right of the
-            intended transition if the intended transition is not successful.
+        :return: Q network
         """
-        self.p_good_trans = p_good_transition
-        self.bias = bias
+        q_net = Sequential()
+        q_net.add(Dense(64, input_dim=self.state_shape, activation='relu', kernel_initializer='he_uniform'))
+        q_net.add(Dense(32, activation='relu', kernel_initializer='he_uniform'))
+        q_net.add(Dense(self.action_shape, activation='linear', kernel_initializer='he_uniform'))
+        q_net.compile(optimizer='adam', loss='mse')
+        return q_net
 
-    def add_rewards(self, step_reward, goal_reward, bad_state_reward=None, restart_state_reward = None):
+    def random_policy(self, state):
         """
-        Define which states incur which rewards.
+        Outputs a random action
 
-        Parameters
-        ----------
-        step_reward : float
-            The reward for each step taken by the agent in the grid world.
-            Typically a negative value (e.g. -1).
-
-        goal_reward : float
-            The reward given to the agent for reaching the goal state.
-            Typically a middle range positive value (e.g. 10)
-
-        bad_state_reward : float
-            The reward given to the agent for transitioning to a bad state.
-            Typically a middle range negative value (e.g. -6)
-
-        restart_state_reward : float
-            The reward given to the agent for transitioning to a restart state.
-            Typically a large negative value (e.g. -100)
+        :param state: not used
+        :return: action
         """
-        self.r_step = step_reward
-        self.r_goal = goal_reward
-        self.r_bad = bad_state_reward
-        self.r_restart = restart_state_reward
+        return list(np.random.random_sample((12,)))
+        # return np.random.randint(0, 2)
 
-    def add_discount(self, discount):
+    def collect_policy(self, state):
         """
-        Discount rewards so that recent rewards carry more weight than past rewards.
+        Similar to policy but with some randomness to encourage exploration.
 
-        Parameters
-        ----------
-        discount : float (in the interval [0, 1])
-            The discount factor.
+        :param state: the game state
+        :return: action
         """
-        self.gamma = discount
+        if np.random.random() < 0.05:
+            return self.random_policy(state)
+        return self.policy(state)
 
-    def create_gridworld(self):
+    def policy(self, state):
         """
-        Create the grid world with the specified parameters.
-
-        Returns
-        -------
-        self : class object
-            Holds information about the environment to solve
-            such as the reward structure and the transition dynamics.
+        Takes a state from the game environment and returns an action that
+        has the highest Q value and should be taken as the next step.
+        :param state: the current game environment state
+        :return: an action
         """
-        self.num_actions = 4
-        self.num_states = self.num_cols * self.num_rows + 1
-        self.start_state_seq = row_col_to_seq(self.start_state, self.num_cols)
-        self.goal_states_seq = row_col_to_seq(self.goal_states, self.num_cols)
-
-        # rewards structure
-        self.R = self.r_step * np.ones((self.num_states, 1))
-        self.R[self.num_states-1] = 0
-        self.R[self.goal_states_seq] = self.r_goal
-        for i in range(self.num_bad_states):
-            if self.r_bad is None:
-                raise Exception("Bad state specified but no reward is given")
-            bad_state = row_col_to_seq(self.bad_states[i,:].reshape(1,-1), self.num_cols)
-            self.R[bad_state, :] = self.r_bad
-        for i in range(self.num_restart_states):
-            if self.r_restart is None:
-                raise Exception("Restart state specified but no reward is given")
-            restart_state = row_col_to_seq(self.restart_states[i,:].reshape(1,-1), self.num_cols)
-            self.R[restart_state, :] = self.r_restart
-
-        # probability model
-        if self.p_good_trans == None:
-            raise Exception("Must assign probability and bias terms via the add_transition_probability method.")
-
-        self.P = np.zeros((self.num_states,self.num_states,self.num_actions))
-        for action in range(self.num_actions):
-            for state in range(self.num_states):
-
-                # check if state is the fictional end state - self transition
-                if state == self.num_states-1:
-                    self.P[state, state, action] = 1
-                    continue
-
-                # check if the state is the goal state or an obstructed state - transition to end
-                row_col = seq_to_col_row(state, self.num_cols)
-                if self.obs_states is not None:
-                    end_states = np.vstack((self.obs_states, self.goal_states))
-                else:
-                    end_states = self.goal_states
-
-                if any(np.sum(np.abs(end_states-row_col), 1) == 0):
-                    self.P[state, self.num_states-1, action] = 1
-
-                # else consider stochastic effects of action
-                else:
-                    for dir in range(-1,2,1):
-                        direction = self._get_direction(action, dir)
-                        next_state = self._get_state(state, direction)
-                        if dir == 0:
-                            prob = self.p_good_trans
-                        elif dir == -1:
-                            prob = (1 - self.p_good_trans)*(self.bias)
-                        elif dir == 1:
-                            prob = (1 - self.p_good_trans)*(1-self.bias)
-
-                        self.P[state, next_state, action] += prob
-
-                # make restart states transition back to the start state with
-                # probability 1
-                if self.restart_states is not None:
-                    if any(np.sum(np.abs(self.restart_states-row_col),1)==0):
-                        next_state = row_col_to_seq(self.start_state, self.num_cols)
-                        self.P[state,:,:] = 0
-                        self.P[state,next_state,:] = 1
-        return self
-
-    def _get_direction(self, action, direction):
+        state_input = tf.convert_to_tensor([state[0]], dtype=tf.float32)
+        action_q = self.q_net(state_input)
+        action = action_q.numpy()[0]
+        return action
+    def update_target_network(self):
         """
-        Takes is a direction and an action and returns a new direction.
+        Updates the current target_q_net with the q_net which brings all the
+        training in the q_net to the target_q_net.
 
-        Parameters
-        ----------
-        action : int
-            The current action 0, 1, 2, 3 for gridworld.
-
-        direction : int
-            Either -1, 0, 1.
-
-        Returns
-        -------
-        direction : int
-            Value either 0, 1, 2, 3.
+        :return: None
         """
-        left = [2,3,1,0]
-        right = [3,2,0,1]
-        if direction == 0:
-            new_direction = action
-        elif direction == -1:
-            new_direction = left[action]
-        elif direction == 1:
-            new_direction = right[action]
-        else:
-            raise Exception("getDir received an unspecified case")
-        return new_direction
+        self.target_q_net.set_weights(self.q_net.get_weights())
 
-    def _get_state(self, state, direction):
+    def train(self, batch):
         """
-        Get the next_state from the current state and a direction.
+        Trains the underlying network with a batch of gameplay experiences to
+        help it better predict the Q values.
 
-        Parameters
-        ----------
-        state : int
-            The current state.
-
-        direction : int
-            The current direction.
-
-        Returns
-        -------
-        next_state : int
-            The next state given the current state and direction.
+        :param batch: a batch of gameplay experiences
+        :return: training loss
         """
-        row_change = [-1,1,0,0]
-        col_change = [0,0,-1,1]
-        row_col = seq_to_col_row(state, self.num_cols)
-        row_col[0,0] += row_change[direction]
-        row_col[0,1] += col_change[direction]
-
-        # check for invalid states
-        if self.obs_states is not None:
-            if (np.any(row_col < 0) or
-                np.any(row_col[:,0] > self.num_rows-1) or
-                np.any(row_col[:,1] > self.num_cols-1) or
-                np.any(np.sum(abs(self.obs_states - row_col), 1)==0)):
-                next_state = state
-            else:
-                next_state = row_col_to_seq(row_col, self.num_cols)[0]
-        else:
-            if (np.any(row_col < 0) or
-                np.any(row_col[:,0] > self.num_rows-1) or
-                np.any(row_col[:,1] > self.num_cols-1)):
-                next_state = state
-            else:
-                next_state = row_col_to_seq(row_col, self.num_cols)[0]
-
-        return next_state
-def qlearning(model, alpha=0.5, epsilon=0.1, maxiter=100, maxeps=1000):
-    """
-    Solves the supplied environment using Q-learning.
-
-    Parameters
-    ----------
-    model : python object
-        Holds information about the environment to solve
-        such as the reward structure and the transition dynamics.
-
-    alpha : float
-        Algorithm learning rate. Defaults to 0.5.
-
-    epsilon : float
-         Probability that a random action is selected. epsilon must be
-         in the interval [0,1] where 0 means that the action is selected
-         in a completely greedy manner and 1 means the action is always
-         selected randomly.
-
-    maxiter : int
-        The maximum number of iterations to perform per episode.
-        Defaults to 100.
-
-    maxeps : int
-        The number of episodes to run SARSA for.
-        Defaults to 1000.
-
-    Returns
-    -------
-    q : numpy array of shape (N, 1)
-        The state-action value for the environment where N is the
-        total number of states
-
-    pi : numpy array of shape (N, 1)
-        Optimal policy for the environment where N is the total
-        number of states.
-
-    state_counts : numpy array of shape (N, 1)
-        Counts of the number of times each state is visited
-    """
-    # initialize the state-action value function and the state counts
-    Q = np.zeros((model.num_states, model.num_actions))
-    state_counts = np.zeros((model.num_states, 1))
-
-    for i in range(maxeps):
-
-        if np.mod(i,1000) == 0:
-            print("Running episode %i." % i)
-
-        # for each new episode, start at the given start state
-        state = int(model.start_state_seq)
-
-        for j in range(maxiter):
-            # sample first e-greedy action
-            action = sample_action(Q, state, model.num_actions, epsilon)
-            # initialize p and r
-            p, r = 0, np.random.random()
-
-            # sample the next state according to the action and the
-            # probability of the transition
-            for next_state in range(model.num_states):
-                p += model.P[state, next_state, action]
-                if r <= p:
-                    break
-
-            # Calculate the temporal difference and update Q function
-            Q[state, action] += alpha * (model.R[state] + model.gamma * np.max(Q[next_state, :]) - Q[state, action])
-
-            # count the state visits
-            state_counts[state] += 1
-
-            #Store the previous state
-            state = next_state
-            # End episode is state is a terminal state
-            if np.any(state == model.goal_states_seq):
-                break
-
-    # determine the q function and policy
-    q = np.max(Q, axis=1).reshape(-1,1)
-    pi = np.argmax(Q, axis=1).reshape(-1,1)
-
-    return q, pi, state_counts
-
-def sample_action(Q, state, num_actions, epsilon):
-    """
-    Epsilon greedy action selection.
-
-    Parameters
-    ----------
-    Q : numpy array of shape (N, 1)
-        Q function for the environment where N is the total number of states.
-
-    state : int
-        The current state.
-
-    num_actions : int
-        The number of actions.
-
-    epsilon : float
-         Probability that a random action is selected. epsilon must be
-         in the interval [0,1] where 0 means that the action is selected
-         in a completely greedy manner and 1 means the action is always
-         selected randomly.
-
-    Returns
-    -------
-    action : int
-        Number representing the selected action between 0 and num_actions.
-    """
-    if np.random.random() < epsilon:
-        action = np.random.randint(0, num_actions)
-    else:
-        action = np.argmax(Q[state, :])
-
-    return action
-###########################################################
-#            Run Q-Learning on cliff walk                 #
-###########################################################
-
-# specify world parameters
-# num_rows = 4
-# num_cols = 12
-# restart_states = np.array([[3,1],[3,2],[3,3],[3,4],[3,5],
-#                            [3,6],[3,7],[3,8],[3,9],[3,10]])
-# start_state = np.array([[3,0]])
-# goal_states = np.array([[3,11]])
-
-# # create model
-# gw = GridWorld(num_rows=num_rows,
-#                num_cols=num_cols,
-#                start_state=start_state,
-#                goal_states=goal_states)
-# gw.add_obstructions(restart_states=restart_states)
-# gw.add_rewards(step_reward=-1,
-#                goal_reward=10,
-#                restart_state_reward=-100)
-# gw.add_transition_probability(p_good_transition=1,
-#                               bias=0)
-# gw.add_discount(discount=0.9)
-# model = gw.create_gridworld()
-
-# # solve with Q-Learning
-# q_function, pi, state_counts = qlearning(model, alpha=0.9, epsilon=0.2, maxiter=100, maxeps=10000)
-
-# # plot the results
-# path = "./doc/imgs/qlearning_cliffworld.png"
-# plot_gridworld(model, policy=pi, state_counts=state_counts, title="Q-Learning", path=path)
+        state_batch, next_state_batch, action_batch, reward_batch, done_batch \
+            = batch
+        current_q = self.q_net(state_batch).numpy()
+        target_q = np.copy(current_q)
+        next_q = self.target_q_net(next_state_batch).numpy()
+        max_next_q = np.amax(next_q, axis=1)
+        for i in range(state_batch.shape[0]):
+            target_q_val = reward_batch[i]
+            if not done_batch[i]:
+                target_q_val += 0.95 * max_next_q[i]
+            target_q[i][action_batch[i]] = target_q_val
+        training_history = self.q_net.fit(x=state_batch, y=target_q, verbose=0)
+        loss = training_history.history['loss']
+        return loss
+    
+    '''
