@@ -1,9 +1,10 @@
-Saving progress, modified worldmodels file structure (unrelated)  
+qlearning running, parameter tuning required
+close #1
 on qlearning_devel
 
-next immediate items (  to test after each item) :
+next immediate items (to test after each item) :
 - implement q learning on single arthrobot simulation
-- implement dreamerv3 on single arthrobot simulation
+- implement dreamerv3 on single arthrobot simulation (start with gym-environment file structure)
 - plot rewards vs episodes for all methods
 - implement model saving and deployment for all methods
 - build and test hardware with dreamerv3 (off-repo)

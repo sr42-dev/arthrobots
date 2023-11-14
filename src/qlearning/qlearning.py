@@ -62,29 +62,46 @@ class QL:
 
     The agent that explores the game and learn how to play the game by generating the Q value given a state-action pair according to a set rule.
     """
-    def __init__(self, actions, epsilon, alpha, gamma):
-        self.q = {}
+    def __init__(self, epsilon, alpha, gamma):
+        self.q = {}             # Q table
         self.epsilon = epsilon  # exploration constant
         self.alpha = alpha      # discount constant
         self.gamma = gamma      # discount factor
-        self.actions = actions
+        self.actions = []       # all possible actions
 
     def getQ(self, state, action):
-        return self.q.get((state, action), 0.0)
+        return self.q.get(str((state, action)), 0.0)
 
     def learnQ(self, state, action, reward, value):
         '''
         Q-learning:
             Q(s, a) += alpha * (reward(s,a) + max(Q(s') - Q(s,a))            
         '''
-        oldv = self.q.get((state, action), None)
+        # pre-process states with approximate values
+        decs = 2
+        state = state.round(decimals=2) # truncating all state values to two decimals
+        # randact = np.random.random_sample(12,)
+        action = action.round(decimals=2) # truncating random action values to two decimals
+        self.actions.append(action)
+
+        oldv = self.q.get(str((state, action)), None)
         if oldv is None:
-            self.q[(state, action)] = reward
+            self.q[str((state, action))] = reward
         else:
-            self.q[(state, action)] = oldv + self.alpha * (value - oldv)
+            self.q[str((state, action))] = oldv + self.alpha * (value - oldv)
 
     def chooseAction(self, state, return_q=False):
-        q = [self.getQ(state, a) for a in self.actions]
+
+        # pre-process states with approximate values
+        decs = 2
+        state = state.round(decimals=2) # truncating all state values to two decimals
+        randact = np.random.random_sample(12,)
+        randact = randact.round(decimals=2) # truncating random action values to two decimals
+
+        if not np.any(np.all(randact == self.actions)):
+            self.actions.append(randact) # appending a random action to the action space to facilitate exploration
+
+        q = [self.getQ(state, a) for a in self.actions] 
         maxQ = max(q)
 
         if random.random() < self.epsilon:
@@ -99,6 +116,7 @@ class QL:
         if count > 1:
             best = [i for i in range(len(self.actions)) if q[i] == maxQ]
             i = random.choice(best)
+
         else:
             i = q.index(maxQ)
 
@@ -108,6 +126,11 @@ class QL:
         return action
 
     def learn(self, state1, action1, reward, state2):
+        decs = 2
+        state1 = state1.round(decimals=2) # truncating all state values to two decimals
+        state2 = state2.round(decimals=2) # truncating all state values to two decimals
+        action1 = action1.round(decimals=2) # truncating all action values to two decimals
+
         maxqnew = max([self.getQ(state2, a) for a in self.actions])
         self.learnQ(state1, action1, reward, reward + self.gamma*maxqnew)
 

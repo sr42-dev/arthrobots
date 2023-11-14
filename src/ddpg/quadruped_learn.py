@@ -50,6 +50,10 @@ for i in range(max_episode):
         step_num += 1
         action = agent.step(observation, reward, done)
         observation, reward, done = env.step(action)
+        print('************')
+        print('action:', action)
+        print('observation', observation)
+        print('************')
         print('reward:',reward,'episode:', i, 'step:',step_num,'curr high eps reward:',curr_highest_eps_reward, 'saved:',save_count, 'cutoff count:', cutoff_count)
     
     # take step

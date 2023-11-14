@@ -45,8 +45,7 @@ class AllJoints:
         jtp_msg = JointTrajectory()
         jtp_msg.joint_names = self.joint_name_lst
         point = JointTrajectoryPoint()
-        print(pos)
-        point.positions = pos[0]
+        point.positions = pos
         point.velocities = self.jtp_zeros
         point.accelerations = self.jtp_zeros
         point.effort = self.jtp_zeros
@@ -225,6 +224,20 @@ class QuadrupedEnvironment:
 
         rospy.sleep(0.5)
         self.reward = 0.0
+        
+        # this section of the module collects the state of the robot (34, 0)
+        '''
+        state(
+
+            normalized joint state, 12 : values defining current joint state in range of 0 to 1,
+            different joints, 12 : zeroes array,
+            orientation, 4 : [imu.orientation.x,imu.orientation.y,imu.orientation.z,imu.orientation.w] based on quaternion output,
+            angular velocity, 3 : [imu.angular_velocity.x,imu.angular_velocity.y,imu.angular_velocity.z],
+            linear acceleration * coefficient, 3 : [imu.linear_acceleration.x,imu.linear_acceleration.y,imu.linear_acceleration.z] * (coefficent to weight the linear acceleration lesser)
+
+        )
+        '''
+
         self.state = np.zeros(self.state_shape)
         rospy.wait_for_service('/gazebo/get_model_state')
         model_state = self.get_model_state_proxy(self.get_model_state_req)
@@ -241,11 +254,11 @@ class QuadrupedEnvironment:
 
     # step function for after iteration
     def step(self, action):
-        print('action:',action)
+        #print('action:',action)
         action = action * self.joint_pos_range * self.action_coeff
         self.joint_pos = np.clip(self.joint_pos + action,a_min=self.joint_pos_low,a_max=self.joint_pos_high)
         self.all_joints.move_jtp(self.joint_pos)
-        print('joint pos:',self.joint_pos)
+        #print('joint pos:',self.joint_pos)
 
         rospy.sleep(15.0/60.0)
 
@@ -254,7 +267,7 @@ class QuadrupedEnvironment:
         pos = np.array([model_state.pose.position.x, model_state.pose.position.y, model_state.pose.position.z])
 
         self.reward = self.reward_coeff * (pos[1] - self.last_pos[1] - np.sqrt((pos[0]-self.last_pos[0])**2))
-        print('pos reward:', self.reward)
+        #print('pos reward:', self.reward)
         self.reward -=  0.75 * np.sqrt(np.sum((self.orientation)**2))
 
         normed_js = self.normalize_joint_state(self.joint_state)
@@ -269,7 +282,7 @@ class QuadrupedEnvironment:
         self.last_action = action
 
         curr_time = rospy.get_time()
-        print('time:',curr_time - self.episode_start_time)
+        #print('time:',curr_time - self.episode_start_time)
         if (curr_time - self.episode_start_time) > self.max_sim_time:
             done = True
             self.reset()
@@ -278,7 +291,7 @@ class QuadrupedEnvironment:
             self.reward += -1.0
         else:
             done = False
-        print('state',self.state)
+        #print('state',self.state)
 
         self.reward = np.clip(self.reward,a_min=-10.0,a_max=10.0)
         return self.state, self.reward, done
