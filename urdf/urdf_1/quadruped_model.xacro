@@ -44,7 +44,7 @@
   <xacro:property name="servo_effort_limit" value="50.0" />
 
   <!-- Import Rviz colors -->
-  <xacro:include filename="$(find quadruped)/urdf_1/materials.xacro" />
+  <xacro:include filename="$(find quadruped)/urdf/urdf_1/materials.xacro" />
 
   <!-- Inertia -->
   <xacro:macro name="box_inertial" params="mass width depth">

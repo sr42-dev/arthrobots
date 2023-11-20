@@ -4,10 +4,10 @@
   <arg name="urdf_base_path" default="$(find quadruped)/" />
 
   <!-- Arguments for robot descriptions -->
-  <arg name="robot1_model" default="$(arg urdf_base_path)/urdf_1/quadruped_model.xacro" />
-  <arg name="robot2_model" default="$(arg urdf_base_path)/urdf_2/quadruped_model.xacro" />
-  <arg name="robot3_model" default="$(arg urdf_base_path)/urdf_3/quadruped_model.xacro" />
-  <arg name="robot4_model" default="$(arg urdf_base_path)/urdf_4/quadruped_model.xacro" />
+  <arg name="robot1_model" default="$(arg urdf_base_path)/urdf/urdf_1/quadruped_model.xacro" />
+  <arg name="robot2_model" default="$(arg urdf_base_path)/urdf/urdf_2/quadruped_model.xacro" />
+  <arg name="robot3_model" default="$(arg urdf_base_path)/urdf/urdf_3/quadruped_model.xacro" />
+  <arg name="robot4_model" default="$(arg urdf_base_path)/urdf/urdf_4/quadruped_model.xacro" />
 
   <!-- Launch Gazebo World -->
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
@@ -20,7 +20,7 @@
   </include>
 
   <!-- Load robot descriptions -->
-  <param name="robot_description" command="$(find xacro)/xacro '$(find quadruped)/urdf/quadruped_model.xacro'" />
+  <param name="robot_description" command="$(find xacro)/xacro '$(find quadruped)/urdf/urdf_0/quadruped_model.xacro'" />
   <param name="robot_description_Robot1" command="$(find xacro)/xacro  $(arg robot1_model)" />
   <param name="robot_description_Robot2" command="$(find xacro)/xacro  $(arg robot2_model)" />
   <param name="robot_description_Robot3" command="$(find xacro)/xacro  $(arg robot3_model)" />
