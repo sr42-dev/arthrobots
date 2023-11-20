@@ -1,7 +1,8 @@
 <launch>
   <!-- Arguments -->
-  <arg name="robot_name" />
-  <arg name="model" default="" />  <!-- This will be set in multi_robot.launch -->
+  <arg name="urdf_base_path" default="$(find quadruped)/" />
+  <arg name="robot_name" default="quadruped"/>
+  <arg name="model" default="$(arg urdf_base_path)/urdf/quadruped_model.xacro"/>  <!-- This will be set in multi_robot.launch -->
   <arg name="init_pose" />
   <arg name="joint_controller_parent" />
 
