@@ -1,0 +1,591 @@
+╭─────────────────────────────── Traceback (most recent call last) ────────────────────────────────╮
+│ /home/sr42/catkin_ws/src/arthrobots/src/worldmodels/quadruped_learn.py:54 in <module>            │
+│                                                                                                  │
+│   51                                                                                             │
+│   52                                                                                             │
+│   53 if __name__ == '__main__':                                                                  │
+│ ❱ 54   main()                                                                                    │
+│   55                                                                                             │
+│                                                                                                  │
+│ /home/sr42/catkin_ws/src/arthrobots/src/worldmodels/quadruped_learn.py:43 in main                │
+│                                                                                                  │
+│   40   env = dreamerv3.wrap_env(env, config)                                                     │
+│   41   env = embodied.BatchEnv([env], parallel=False)                                            │
+│   42                                                                                             │
+│ ❱ 43   agent = dreamerv3.Agent(env.obs_space, env.act_space, step, config)                       │
+│   44   replay = embodied.replay.Uniform(                                                         │
+│   45 │     config.batch_length, config.replay_size, logdir / 'replay')                           │
+│   46   args = embodied.Config(                                                                   │
+│                                                                                                  │
+│ /home/sr42/.local/lib/python3.8/site-packages/dreamerv3/jaxagent.py:20 in __init__               │
+│                                                                                                  │
+│    17 │   configs = agent_cls.configs                                                            │
+│    18 │   inner = agent_cls                                                                      │
+│    19 │   def __init__(self, *args, **kwargs):                                                   │
+│ ❱  20 │     super().__init__(agent_cls, *args, **kwargs)                                         │
+│    21   return Agent                                                                             │
+│    22                                                                                            │
+│    23                                                                                            │
+│                                                                                                  │
+│ /home/sr42/.local/lib/python3.8/site-packages/dreamerv3/jaxagent.py:48 in __init__               │
+│                                                                                                  │
+│    45 │   self._updates = embodied.Counter()                                                     │
+│    46 │   self._should_metrics = embodied.when.Every(self.config.metrics_every)                  │
+│    47 │   self._transform()                                                                      │
+│ ❱  48 │   self.varibs = self._init_varibs(obs_space, act_space)                                  │
+│    49 │   self.sync()                                                                            │
+│    50                                                                                            │
+│    51   def policy(self, obs, state=None, mode='train'):                                         │
+│                                                                                                  │
+│ /home/sr42/.local/lib/python3.8/site-packages/dreamerv3/jaxagent.py:228 in _init_varibs          │
+│                                                                                                  │
+│   225 │   data = self._dummy_batch({**obs_space, **act_space}, dims)                             │
+│   226 │   data = self._convert_inps(data, self.train_devices)                                    │
+│   227 │   state, varibs = self._init_train(varibs, rng, data['is_first'])                        │
+│ ❱ 228 │   varibs = self._train(varibs, rng, data, state, init_only=True)                         │
+│   229 │   # obs = self._dummy_batch(obs_space, (1,))                                             │
+│   230 │   # state, varibs = self._init_policy(varibs, rng, obs['is_first'])                      │
+│   231 │   # varibs = self._policy(                                                               │
+│                                                                                                  │
+│ /home/sr42/.local/lib/python3.8/site-packages/dreamerv3/ninjax.py:199 in wrapper                 │
+│                                                                                                  │
+│   196 │   statics = tuple(sorted([(k, v) for k, v in kw.items() if k in static]))                │
+│   197 │   kw = {k: v for k, v in kw.items() if k not in static}                                  │
+│   198 │   if not hasattr(wrapper, 'keys'):                                                       │
+│ ❱ 199 │     created = init(statics, rng, *args, **kw)                                            │
+│   200 │     wrapper.keys = set(created.keys())                                                   │
+│   201 │     for key, value in created.items():                                                   │
+│   202 │   │   if key not in state:                                                               │
+│                                                                                                  │
+│ /home/sr42/.local/lib/python3.8/site-packages/jax/_src/traceback_util.py:166 in                  │
+│ reraise_with_filtered_traceback                                                                  │
+│                                                                                                  │
+│   163   def reraise_with_filtered_traceback(*args, **kwargs):                                    │
+│   164 │   __tracebackhide__ = True                                                               │
+│   165 │   try:                                                                                   │
+│ ❱ 166 │     return fun(*args, **kwargs)                                                          │
+│   167 │   except Exception as e:                                                                 │
+│   168 │     mode = _filtering_mode()                                                             │
+│   169 │     if _is_under_reraiser(e) or mode == "off":                                           │
+│                                                                                                  │
+│ /home/sr42/.local/lib/python3.8/site-packages/jax/_src/pjit.py:250 in cache_miss                 │
+│                                                                                                  │
+│    247                                                                                           │
+│    248   @api_boundary                                                                           │
+│    249   def cache_miss(*args, **kwargs):                                                        │
+│ ❱  250 │   outs, out_flat, out_tree, args_flat, jaxpr = _python_pjit_helper(                     │
+│    251 │   │   fun, infer_params_fn, *args, **kwargs)                                            │
+│    252 │   executable = _read_most_recent_pjit_call_executable(jaxpr)                            │
+│    253 │   fastpath_data = _get_fastpath_data(executable, out_tree, args_flat, out_flat)         │
+│                                                                                                  │
+│ /home/sr42/.local/lib/python3.8/site-packages/jax/_src/pjit.py:158 in _python_pjit_helper        │
+│                                                                                                  │
+│    155                                                                                           │
+│    156                                                                                           │
+│    157 def _python_pjit_helper(fun, infer_params_fn, *args, **kwargs):                           │
+│ ❱  158   args_flat, _, params, in_tree, out_tree, _ = infer_params_fn(                           │
+│    159 │     *args, **kwargs)                                                                    │
+│    160   for arg in args_flat:                                                                   │
+│    161 │   dispatch.check_arg(arg)                                                               │
+│                                                                                                  │
+│ /home/sr42/.local/lib/python3.8/site-packages/jax/_src/api.py:306 in infer_params                │
+│                                                                                                  │
+│    303 │   │   static_argnames=static_argnames, donate_argnums=donate_argnums,                   │
+│    304 │   │   device=device, backend=backend, keep_unused=keep_unused,                          │
+│    305 │   │   inline=inline, resource_env=None, abstracted_axes=abstracted_axes)                │
+│ ❱  306 │   return pjit.common_infer_params(pjit_info_args, *args, **kwargs)                      │
+│    307                                                                                           │
+│    308   has_explicit_sharding = pjit._pjit_explicit_sharding(                                   │
+│    309 │     in_shardings, out_shardings, device, backend)                                       │
+│                                                                                                  │
+│ /home/sr42/.local/lib/python3.8/site-packages/jax/_src/pjit.py:505 in common_infer_params        │
+│                                                                                                  │
+│    502 │     hashable_pytree(in_shardings), in_avals, in_tree, resource_env, dbg,                │
+│    503 │     device_or_backend_set)                                                              │
+│    504                                                                                           │
+│ ❱  505   jaxpr, consts, canonicalized_out_shardings_flat = _pjit_jaxpr(                          │
+│    506 │     flat_fun, hashable_pytree(out_shardings), in_type, dbg,                             │
+│    507 │     device_or_backend_set, HashableFunction(out_tree, closure=()),                      │
+│    508 │     HashableFunction(res_paths, closure=()))                                            │
+│                                                                                                  │
+│ /home/sr42/.local/lib/python3.8/site-packages/jax/_src/pjit.py:971 in _pjit_jaxpr                │
+│                                                                                                  │
+│    968                                                                                           │
+│    969 def _pjit_jaxpr(fun, out_shardings_thunk, in_type, debug_info,                            │
+│    970 │   │   │   │   device_or_backend_set, out_tree, result_paths):                           │
+│ ❱  971   jaxpr, final_consts, out_type = _create_pjit_jaxpr(                                     │
+│    972 │     fun, in_type, debug_info, result_paths)                                             │
+│    973   canonicalized_out_shardings_flat = _check_and_canonicalize_out_shardings(               │
+│    974 │     out_shardings_thunk, out_tree, tuple(out_type), jaxpr.jaxpr.debug_info,             │
+│                                                                                                  │
+│ /home/sr42/.local/lib/python3.8/site-packages/jax/_src/linear_util.py:345 in memoized_fun        │
+│                                                                                                  │
+│   342 │     ans, stores = result                                                                 │
+│   343 │     fun.populate_stores(stores)                                                          │
+│   344 │   else:                                                                                  │
+│ ❱ 345 │     ans = call(fun, *args)                                                               │
+│   346 │     cache[key] = (ans, fun.stores)                                                       │
+│   347 │                                                                                          │
+│   348 │   return ans                                                                             │
+│                                                                                                  │
+│ /home/sr42/.local/lib/python3.8/site-packages/jax/_src/pjit.py:924 in _create_pjit_jaxpr         │
+│                                                                                                  │
+│    921 │     jaxpr, global_out_avals, consts = pe.trace_to_jaxpr_dynamic2(                       │
+│    922 │   │     lu.annotate(fun, in_type), debug_info=pe_debug)                                 │
+│    923 │   else:                                                                                 │
+│ ❱  924 │     jaxpr, global_out_avals, consts = pe.trace_to_jaxpr_dynamic(                        │
+│    925 │   │     fun, in_type, debug_info=pe_debug)                                              │
+│    926                                                                                           │
+│    927   if not config.jax_dynamic_shapes:                                                       │
+│                                                                                                  │
+│ /home/sr42/.local/lib/python3.8/site-packages/jax/_src/profiler.py:314 in wrapper                │
+│                                                                                                  │
+│   311   @wraps(func)                                                                             │
+│   312   def wrapper(*args, **kwargs):                                                            │
+│   313 │   with TraceAnnotation(name, **decorator_kwargs):                                        │
+│ ❱ 314 │     return func(*args, **kwargs)                                                         │
+│   315 │   return wrapper                                                                         │
+│   316   return wrapper                                                                           │
+│   317                                                                                            │
+│                                                                                                  │
+│ /home/sr42/.local/lib/python3.8/site-packages/jax/_src/interpreters/partial_eval.py:2155 in      │
+│ trace_to_jaxpr_dynamic                                                                           │
+│                                                                                                  │
+│   2152 ) -> Tuple[Jaxpr, List[AbstractValue], List[Any]]:                                        │
+│   2153   with core.new_main(DynamicJaxprTrace, dynamic=True) as main:  # type: ignore            │
+│   2154 │   main.jaxpr_stack = ()  # type: ignore                                                 │
+│ ❱ 2155 │   jaxpr, out_avals, consts = trace_to_subjaxpr_dynamic(                                 │
+│   2156 │     fun, main, in_avals, keep_inputs=keep_inputs, debug_info=debug_info)                │
+│   2157 │   del main, fun                                                                         │
+│   2158   return jaxpr, out_avals, consts                                                         │
+│                                                                                                  │
+│ /home/sr42/.local/lib/python3.8/site-packages/jax/_src/interpreters/partial_eval.py:2177 in      │
+│ trace_to_subjaxpr_dynamic                                                                        │
+│                                                                                                  │
+│   2174 │   trace = DynamicJaxprTrace(main, core.cur_sublevel())                                  │
+│   2175 │   in_tracers = _input_type_to_tracers(trace.new_arg, in_avals)                          │
+│   2176 │   in_tracers_ = [t for t, keep in zip(in_tracers, keep_inputs) if keep]                 │
+│ ❱ 2177 │   ans = fun.call_wrapped(*in_tracers_)                                                  │
+│   2178 │   out_tracers = map(trace.full_raise, ans)                                              │
+│   2179 │   jaxpr, consts = frame.to_jaxpr(out_tracers)                                           │
+│   2180 │   del fun, main, trace, frame, in_tracers, out_tracers, ans                             │
+│                                                                                                  │
+│ /home/sr42/.local/lib/python3.8/site-packages/jax/_src/linear_util.py:188 in call_wrapped        │
+│                                                                                                  │
+│   185 │   gen = gen_static_args = out_store = None                                               │
+│   186 │                                                                                          │
+│   187 │   try:                                                                                   │
+│ ❱ 188 │     ans = self.f(*args, **dict(self.params, **kwargs))                                   │
+│   189 │   except:                                                                                │
+│   190 │     # Some transformations yield from inside context managers, so we have to             │
+│   191 │     # interrupt them before reraising the exception. Otherwise they will only            │
+│                                                                                                  │
+│ /home/sr42/.local/lib/python3.8/site-packages/dreamerv3/ninjax.py:184 in init                    │
+│                                                                                                  │
+│   181   @bind(jax.jit, static_argnums=[0], **kwargs)                                             │
+│   182   def init(statics, rng, *args, **kw):                                                     │
+│   183 │   # Return only state so JIT can remove dead code for fast initialization.               │
+│ ❱ 184 │   s = fun({}, rng, *args, ignore=True, **dict(statics), **kw)[1]                         │
+│   185 │   return s                                                                               │
+│   186                                                                                            │
+│   187   @bind(jax.jit, static_argnums=[0], **kwargs)                                             │
+│                                                                                                  │
+│ /home/sr42/.local/lib/python3.8/site-packages/dreamerv3/ninjax.py:95 in purified                 │
+│                                                                                                  │
+│    92 │   │   rng = jax.random.PRNGKey(rng)                                                      │
+│    93 │     context = Context(state.copy(), rng, create, modify, ignore, [], name)               │
+│    94 │     CONTEXT[threading.get_ident()] = context                                             │
+│ ❱  95 │     out = fun(*args, **kwargs)                                                           │
+│    96 │     state = dict(context)                                                                │
+│    97 │     return out, state                                                                    │
+│    98 │   finally:                                                                               │
+│                                                                                                  │
+│ /home/sr42/.local/lib/python3.8/site-packages/dreamerv3/ninjax.py:380 in wrapper                 │
+│                                                                                                  │
+│   377   def wrapper(self, *args, **kwargs):                                                      │
+│   378 │   with scope(self._path, absolute=True):                                                 │
+│   379 │     with jax.named_scope(self._path.split('/')[-1]):                                     │
+│ ❱ 380 │   │   return method(self, *args, **kwargs)                                               │
+│   381   return wrapper                                                                           │
+│   382                                                                                            │
+│   383                                                                                            │
+│                                                                                                  │
+│ /home/sr42/.local/lib/python3.8/site-packages/dreamerv3/agent.py:80 in train                     │
+│                                                                                                  │
+│    77 │   self.config.jax.jit and print('Tracing train function.')                               │
+│    78 │   metrics = {}                                                                           │
+│    79 │   data = self.preprocess(data)                                                           │
+│ ❱  80 │   state, wm_outs, mets = self.wm.train(data, state)                                      │
+│    81 │   metrics.update(mets)                                                                   │
+│    82 │   context = {**data, **wm_outs['post']}                                                  │
+│    83 │   start = tree_map(lambda x: x.reshape([-1] + list(x.shape[2:])), context)               │
+│                                                                                                  │
+│ /home/sr42/.local/lib/python3.8/site-packages/dreamerv3/ninjax.py:380 in wrapper                 │
+│                                                                                                  │
+│   377   def wrapper(self, *args, **kwargs):                                                      │
+│   378 │   with scope(self._path, absolute=True):                                                 │
+│   379 │     with jax.named_scope(self._path.split('/')[-1]):                                     │
+│ ❱ 380 │   │   return method(self, *args, **kwargs)                                               │
+│   381   return wrapper                                                                           │
+│   382                                                                                            │
+│   383                                                                                            │
+│                                                                                                  │
+│ /home/sr42/.local/lib/python3.8/site-packages/dreamerv3/agent.py:146 in train                    │
+│                                                                                                  │
+│   143                                                                                            │
+│   144   def train(self, data, state):                                                            │
+│   145 │   modules = [self.encoder, self.rssm, *self.heads.values()]                              │
+│ ❱ 146 │   mets, (state, outs, metrics) = self.opt(                                               │
+│   147 │   │   modules, self.loss, data, state, has_aux=True)                                     │
+│   148 │   metrics.update(mets)                                                                   │
+│   149 │   return state, outs, metrics                                                            │
+│                                                                                                  │
+│ /home/sr42/.local/lib/python3.8/site-packages/dreamerv3/ninjax.py:380 in wrapper                 │
+│                                                                                                  │
+│   377   def wrapper(self, *args, **kwargs):                                                      │
+│   378 │   with scope(self._path, absolute=True):                                                 │
+│   379 │     with jax.named_scope(self._path.split('/')[-1]):                                     │
+│ ❱ 380 │   │   return method(self, *args, **kwargs)                                               │
+│   381   return wrapper                                                                           │
+│   382                                                                                            │
+│   383                                                                                            │
+│                                                                                                  │
+│ /home/sr42/.local/lib/python3.8/site-packages/dreamerv3/jaxutils.py:390 in __call__              │
+│                                                                                                  │
+│   387 │   │   loss *= sg(self.grad_scale.read())                                                 │
+│   388 │     return loss, aux                                                                     │
+│   389 │   metrics = {}                                                                           │
+│ ❱ 390 │   loss, params, grads, aux = nj.grad(                                                    │
+│   391 │   │   wrapped, modules, has_aux=True)(*args, **kwargs)                                   │
+│   392 │   if not self.PARAM_COUNTS[self.path]:                                                   │
+│   393 │     count = sum([np.prod(x.shape) for x in params.values()])                             │
+│                                                                                                  │
+│ /home/sr42/.local/lib/python3.8/site-packages/dreamerv3/ninjax.py:160 in wrapper                 │
+│                                                                                                  │
+│   157   backward = jax.value_and_grad(forward, has_aux=True)                                     │
+│   158   @functools.wraps(backward)                                                               │
+│   159   def wrapper(*args, **kwargs):                                                            │
+│ ❱ 160 │   _prerun(fun, *args, **kwargs)                                                          │
+│   161 │   assert all(isinstance(x, (str, Module)) for x in keys)                                 │
+│   162 │   strs = [x for x in keys if isinstance(x, str)]                                         │
+│   163 │   mods = [x for x in keys if isinstance(x, Module)]                                      │
+│                                                                                                  │
+│ /usr/lib/python3.8/contextlib.py:75 in inner                                                     │
+│                                                                                                  │
+│    72 │   │   @wraps(func)                                                                       │
+│    73 │   │   def inner(*args, **kwds):                                                          │
+│    74 │   │   │   with self._recreate_cm():                                                      │
+│ ❱  75 │   │   │   │   return func(*args, **kwds)                                                 │
+│    76 │   │   return inner                                                                       │
+│    77                                                                                            │
+│    78                                                                                            │
+│                                                                                                  │
+│ /home/sr42/.local/lib/python3.8/site-packages/dreamerv3/ninjax.py:297 in _prerun                 │
+│                                                                                                  │
+│   294 def _prerun(fun, *args, **kwargs):                                                         │
+│   295   if not context().create:                                                                 │
+│   296 │   return                                                                                 │
+│ ❱ 297   discarded, state = fun(dict(context()), rng(), *args, ignore=True, **kwargs)             │
+│   298   # jax.tree_util.tree_map(                                                                │
+│   299   #     lambda x: hasattr(x, 'delete') and x.delete(), discarded)                          │
+│   300   context().update(state)                                                                  │
+│                                                                                                  │
+│ /home/sr42/.local/lib/python3.8/site-packages/dreamerv3/ninjax.py:95 in purified                 │
+│                                                                                                  │
+│    92 │   │   rng = jax.random.PRNGKey(rng)                                                      │
+│    93 │     context = Context(state.copy(), rng, create, modify, ignore, [], name)               │
+│    94 │     CONTEXT[threading.get_ident()] = context                                             │
+│ ❱  95 │     out = fun(*args, **kwargs)                                                           │
+│    96 │     state = dict(context)                                                                │
+│    97 │     return out, state                                                                    │
+│    98 │   finally:                                                                               │
+│                                                                                                  │
+│ /home/sr42/.local/lib/python3.8/site-packages/dreamerv3/jaxutils.py:382 in wrapped               │
+│                                                                                                  │
+│   379                                                                                            │
+│   380   def __call__(self, modules, lossfn, *args, has_aux=False, **kwargs):                     │
+│   381 │   def wrapped(*args, **kwargs):                                                          │
+│ ❱ 382 │     outs = lossfn(*args, **kwargs)                                                       │
+│   383 │     loss, aux = outs if has_aux else (outs, None)                                        │
+│   384 │     assert loss.dtype == jnp.float32, (self.name, loss.dtype)                            │
+│   385 │     assert loss.shape == (), (self.name, loss.shape)                                     │
+│                                                                                                  │
+│ /home/sr42/.local/lib/python3.8/site-packages/dreamerv3/ninjax.py:380 in wrapper                 │
+│                                                                                                  │
+│   377   def wrapper(self, *args, **kwargs):                                                      │
+│   378 │   with scope(self._path, absolute=True):                                                 │
+│   379 │     with jax.named_scope(self._path.split('/')[-1]):                                     │
+│ ❱ 380 │   │   return method(self, *args, **kwargs)                                               │
+│   381   return wrapper                                                                           │
+│   382                                                                                            │
+│   383                                                                                            │
+│                                                                                                  │
+│ /home/sr42/.local/lib/python3.8/site-packages/dreamerv3/agent.py:152 in loss                     │
+│                                                                                                  │
+│   149 │   return state, outs, metrics                                                            │
+│   150                                                                                            │
+│   151   def loss(self, data, state):                                                             │
+│ ❱ 152 │   embed = self.encoder(data)                                                             │
+│   153 │   prev_latent, prev_action = state                                                       │
+│   154 │   prev_actions = jnp.concatenate([                                                       │
+│   155 │   │   prev_action[:, None], data['action'][:, :-1]], 1)                                  │
+│                                                                                                  │
+│ /home/sr42/.local/lib/python3.8/site-packages/dreamerv3/ninjax.py:380 in wrapper                 │
+│                                                                                                  │
+│   377   def wrapper(self, *args, **kwargs):                                                      │
+│   378 │   with scope(self._path, absolute=True):                                                 │
+│   379 │     with jax.named_scope(self._path.split('/')[-1]):                                     │
+│ ❱ 380 │   │   return method(self, *args, **kwargs)                                               │
+│   381   return wrapper                                                                           │
+│   382                                                                                            │
+│   383                                                                                            │
+│                                                                                                  │
+│ /home/sr42/.local/lib/python3.8/site-packages/dreamerv3/nets.py:217 in __call__                  │
+│                                                                                                  │
+│   214 │     self._mlp = MLP(None, mlp_layers, mlp_units, dist='none', **mlp_kw)                  │
+│   215                                                                                            │
+│   216   def __call__(self, data):                                                                │
+│ ❱ 217 │   some_key, some_shape = list(self.shapes.items())[0]                                    │
+│   218 │   batch_dims = data[some_key].shape[:-len(some_shape)]                                   │
+│   219 │   data = {                                                                               │
+│   220 │   │   k: v.reshape((-1,) + v.shape[len(batch_dims):])                                    │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
+UnfilteredStackTrace: IndexError: list index out of range
+
+The stack trace below excludes JAX-internal frames.
+The preceding is the original exception that occurred, unmodified.
+
+--------------------
+
+The above exception was the direct cause of the following exception:
+
+╭─────────────────────────────── Traceback (most recent call last) ────────────────────────────────╮
+│ /home/sr42/catkin_ws/src/arthrobots/src/worldmodels/quadruped_learn.py:54 in <module>            │
+│                                                                                                  │
+│   51                                                                                             │
+│   52                                                                                             │
+│   53 if __name__ == '__main__':                                                                  │
+│ ❱ 54   main()                                                                                    │
+│   55                                                                                             │
+│                                                                                                  │
+│ /home/sr42/catkin_ws/src/arthrobots/src/worldmodels/quadruped_learn.py:43 in main                │
+│                                                                                                  │
+│   40   env = dreamerv3.wrap_env(env, config)                                                     │
+│   41   env = embodied.BatchEnv([env], parallel=False)                                            │
+│   42                                                                                             │
+│ ❱ 43   agent = dreamerv3.Agent(env.obs_space, env.act_space, step, config)                       │
+│   44   replay = embodied.replay.Uniform(                                                         │
+│   45 │     config.batch_length, config.replay_size, logdir / 'replay')                           │
+│   46   args = embodied.Config(                                                                   │
+│                                                                                                  │
+│ /home/sr42/.local/lib/python3.8/site-packages/dreamerv3/jaxagent.py:20 in __init__               │
+│                                                                                                  │
+│    17 │   configs = agent_cls.configs                                                            │
+│    18 │   inner = agent_cls                                                                      │
+│    19 │   def __init__(self, *args, **kwargs):                                                   │
+│ ❱  20 │     super().__init__(agent_cls, *args, **kwargs)                                         │
+│    21   return Agent                                                                             │
+│    22                                                                                            │
+│    23                                                                                            │
+│                                                                                                  │
+│ /home/sr42/.local/lib/python3.8/site-packages/dreamerv3/jaxagent.py:48 in __init__               │
+│                                                                                                  │
+│    45 │   self._updates = embodied.Counter()                                                     │
+│    46 │   self._should_metrics = embodied.when.Every(self.config.metrics_every)                  │
+│    47 │   self._transform()                                                                      │
+│ ❱  48 │   self.varibs = self._init_varibs(obs_space, act_space)                                  │
+│    49 │   self.sync()                                                                            │
+│    50                                                                                            │
+│    51   def policy(self, obs, state=None, mode='train'):                                         │
+│                                                                                                  │
+│ /home/sr42/.local/lib/python3.8/site-packages/dreamerv3/jaxagent.py:228 in _init_varibs          │
+│                                                                                                  │
+│   225 │   data = self._dummy_batch({**obs_space, **act_space}, dims)                             │
+│   226 │   data = self._convert_inps(data, self.train_devices)                                    │
+│   227 │   state, varibs = self._init_train(varibs, rng, data['is_first'])                        │
+│ ❱ 228 │   varibs = self._train(varibs, rng, data, state, init_only=True)                         │
+│   229 │   # obs = self._dummy_batch(obs_space, (1,))                                             │
+│   230 │   # state, varibs = self._init_policy(varibs, rng, obs['is_first'])                      │
+│   231 │   # varibs = self._policy(                                                               │
+│                                                                                                  │
+│ /home/sr42/.local/lib/python3.8/site-packages/dreamerv3/ninjax.py:199 in wrapper                 │
+│                                                                                                  │
+│   196 │   statics = tuple(sorted([(k, v) for k, v in kw.items() if k in static]))                │
+│   197 │   kw = {k: v for k, v in kw.items() if k not in static}                                  │
+│   198 │   if not hasattr(wrapper, 'keys'):                                                       │
+│ ❱ 199 │     created = init(statics, rng, *args, **kw)                                            │
+│   200 │     wrapper.keys = set(created.keys())                                                   │
+│   201 │     for key, value in created.items():                                                   │
+│   202 │   │   if key not in state:                                                               │
+│                                                                                                  │
+│ /home/sr42/.local/lib/python3.8/site-packages/dreamerv3/ninjax.py:184 in init                    │
+│                                                                                                  │
+│   181   @bind(jax.jit, static_argnums=[0], **kwargs)                                             │
+│   182   def init(statics, rng, *args, **kw):                                                     │
+│   183 │   # Return only state so JIT can remove dead code for fast initialization.               │
+│ ❱ 184 │   s = fun({}, rng, *args, ignore=True, **dict(statics), **kw)[1]                         │
+│   185 │   return s                                                                               │
+│   186                                                                                            │
+│   187   @bind(jax.jit, static_argnums=[0], **kwargs)                                             │
+│                                                                                                  │
+│ /home/sr42/.local/lib/python3.8/site-packages/dreamerv3/ninjax.py:95 in purified                 │
+│                                                                                                  │
+│    92 │   │   rng = jax.random.PRNGKey(rng)                                                      │
+│    93 │     context = Context(state.copy(), rng, create, modify, ignore, [], name)               │
+│    94 │     CONTEXT[threading.get_ident()] = context                                             │
+│ ❱  95 │     out = fun(*args, **kwargs)                                                           │
+│    96 │     state = dict(context)                                                                │
+│    97 │     return out, state                                                                    │
+│    98 │   finally:                                                                               │
+│                                                                                                  │
+│ /home/sr42/.local/lib/python3.8/site-packages/dreamerv3/ninjax.py:380 in wrapper                 │
+│                                                                                                  │
+│   377   def wrapper(self, *args, **kwargs):                                                      │
+│   378 │   with scope(self._path, absolute=True):                                                 │
+│   379 │     with jax.named_scope(self._path.split('/')[-1]):                                     │
+│ ❱ 380 │   │   return method(self, *args, **kwargs)                                               │
+│   381   return wrapper                                                                           │
+│   382                                                                                            │
+│   383                                                                                            │
+│                                                                                                  │
+│ /home/sr42/.local/lib/python3.8/site-packages/dreamerv3/agent.py:80 in train                     │
+│                                                                                                  │
+│    77 │   self.config.jax.jit and print('Tracing train function.')                               │
+│    78 │   metrics = {}                                                                           │
+│    79 │   data = self.preprocess(data)                                                           │
+│ ❱  80 │   state, wm_outs, mets = self.wm.train(data, state)                                      │
+│    81 │   metrics.update(mets)                                                                   │
+│    82 │   context = {**data, **wm_outs['post']}                                                  │
+│    83 │   start = tree_map(lambda x: x.reshape([-1] + list(x.shape[2:])), context)               │
+│                                                                                                  │
+│ /home/sr42/.local/lib/python3.8/site-packages/dreamerv3/ninjax.py:380 in wrapper                 │
+│                                                                                                  │
+│   377   def wrapper(self, *args, **kwargs):                                                      │
+│   378 │   with scope(self._path, absolute=True):                                                 │
+│   379 │     with jax.named_scope(self._path.split('/')[-1]):                                     │
+│ ❱ 380 │   │   return method(self, *args, **kwargs)                                               │
+│   381   return wrapper                                                                           │
+│   382                                                                                            │
+│   383                                                                                            │
+│                                                                                                  │
+│ /home/sr42/.local/lib/python3.8/site-packages/dreamerv3/agent.py:146 in train                    │
+│                                                                                                  │
+│   143                                                                                            │
+│   144   def train(self, data, state):                                                            │
+│   145 │   modules = [self.encoder, self.rssm, *self.heads.values()]                              │
+│ ❱ 146 │   mets, (state, outs, metrics) = self.opt(                                               │
+│   147 │   │   modules, self.loss, data, state, has_aux=True)                                     │
+│   148 │   metrics.update(mets)                                                                   │
+│   149 │   return state, outs, metrics                                                            │
+│                                                                                                  │
+│ /home/sr42/.local/lib/python3.8/site-packages/dreamerv3/ninjax.py:380 in wrapper                 │
+│                                                                                                  │
+│   377   def wrapper(self, *args, **kwargs):                                                      │
+│   378 │   with scope(self._path, absolute=True):                                                 │
+│   379 │     with jax.named_scope(self._path.split('/')[-1]):                                     │
+│ ❱ 380 │   │   return method(self, *args, **kwargs)                                               │
+│   381   return wrapper                                                                           │
+│   382                                                                                            │
+│   383                                                                                            │
+│                                                                                                  │
+│ /home/sr42/.local/lib/python3.8/site-packages/dreamerv3/jaxutils.py:390 in __call__              │
+│                                                                                                  │
+│   387 │   │   loss *= sg(self.grad_scale.read())                                                 │
+│   388 │     return loss, aux                                                                     │
+│   389 │   metrics = {}                                                                           │
+│ ❱ 390 │   loss, params, grads, aux = nj.grad(                                                    │
+│   391 │   │   wrapped, modules, has_aux=True)(*args, **kwargs)                                   │
+│   392 │   if not self.PARAM_COUNTS[self.path]:                                                   │
+│   393 │     count = sum([np.prod(x.shape) for x in params.values()])                             │
+│                                                                                                  │
+│ /home/sr42/.local/lib/python3.8/site-packages/dreamerv3/ninjax.py:160 in wrapper                 │
+│                                                                                                  │
+│   157   backward = jax.value_and_grad(forward, has_aux=True)                                     │
+│   158   @functools.wraps(backward)                                                               │
+│   159   def wrapper(*args, **kwargs):                                                            │
+│ ❱ 160 │   _prerun(fun, *args, **kwargs)                                                          │
+│   161 │   assert all(isinstance(x, (str, Module)) for x in keys)                                 │
+│   162 │   strs = [x for x in keys if isinstance(x, str)]                                         │
+│   163 │   mods = [x for x in keys if isinstance(x, Module)]                                      │
+│                                                                                                  │
+│ /usr/lib/python3.8/contextlib.py:75 in inner                                                     │
+│                                                                                                  │
+│    72 │   │   @wraps(func)                                                                       │
+│    73 │   │   def inner(*args, **kwds):                                                          │
+│    74 │   │   │   with self._recreate_cm():                                                      │
+│ ❱  75 │   │   │   │   return func(*args, **kwds)                                                 │
+│    76 │   │   return inner                                                                       │
+│    77                                                                                            │
+│    78                                                                                            │
+│                                                                                                  │
+│ /home/sr42/.local/lib/python3.8/site-packages/dreamerv3/ninjax.py:297 in _prerun                 │
+│                                                                                                  │
+│   294 def _prerun(fun, *args, **kwargs):                                                         │
+│   295   if not context().create:                                                                 │
+│   296 │   return                                                                                 │
+│ ❱ 297   discarded, state = fun(dict(context()), rng(), *args, ignore=True, **kwargs)             │
+│   298   # jax.tree_util.tree_map(                                                                │
+│   299   #     lambda x: hasattr(x, 'delete') and x.delete(), discarded)                          │
+│   300   context().update(state)                                                                  │
+│                                                                                                  │
+│ /home/sr42/.local/lib/python3.8/site-packages/dreamerv3/ninjax.py:95 in purified                 │
+│                                                                                                  │
+│    92 │   │   rng = jax.random.PRNGKey(rng)                                                      │
+│    93 │     context = Context(state.copy(), rng, create, modify, ignore, [], name)               │
+│    94 │     CONTEXT[threading.get_ident()] = context                                             │
+│ ❱  95 │     out = fun(*args, **kwargs)                                                           │
+│    96 │     state = dict(context)                                                                │
+│    97 │     return out, state                                                                    │
+│    98 │   finally:                                                                               │
+│                                                                                                  │
+│ /home/sr42/.local/lib/python3.8/site-packages/dreamerv3/jaxutils.py:382 in wrapped               │
+│                                                                                                  │
+│   379                                                                                            │
+│   380   def __call__(self, modules, lossfn, *args, has_aux=False, **kwargs):                     │
+│   381 │   def wrapped(*args, **kwargs):                                                          │
+│ ❱ 382 │     outs = lossfn(*args, **kwargs)                                                       │
+│   383 │     loss, aux = outs if has_aux else (outs, None)                                        │
+│   384 │     assert loss.dtype == jnp.float32, (self.name, loss.dtype)                            │
+│   385 │     assert loss.shape == (), (self.name, loss.shape)                                     │
+│                                                                                                  │
+│ /home/sr42/.local/lib/python3.8/site-packages/dreamerv3/ninjax.py:380 in wrapper                 │
+│                                                                                                  │
+│   377   def wrapper(self, *args, **kwargs):                                                      │
+│   378 │   with scope(self._path, absolute=True):                                                 │
+│   379 │     with jax.named_scope(self._path.split('/')[-1]):                                     │
+│ ❱ 380 │   │   return method(self, *args, **kwargs)                                               │
+│   381   return wrapper                                                                           │
+│   382                                                                                            │
+│   383                                                                                            │
+│                                                                                                  │
+│ /home/sr42/.local/lib/python3.8/site-packages/dreamerv3/agent.py:152 in loss                     │
+│                                                                                                  │
+│   149 │   return state, outs, metrics                                                            │
+│   150                                                                                            │
+│   151   def loss(self, data, state):                                                             │
+│ ❱ 152 │   embed = self.encoder(data)                                                             │
+│   153 │   prev_latent, prev_action = state                                                       │
+│   154 │   prev_actions = jnp.concatenate([                                                       │
+│   155 │   │   prev_action[:, None], data['action'][:, :-1]], 1)                                  │
+│                                                                                                  │
+│ /home/sr42/.local/lib/python3.8/site-packages/dreamerv3/ninjax.py:380 in wrapper                 │
+│                                                                                                  │
+│   377   def wrapper(self, *args, **kwargs):                                                      │
+│   378 │   with scope(self._path, absolute=True):                                                 │
+│   379 │     with jax.named_scope(self._path.split('/')[-1]):                                     │
+│ ❱ 380 │   │   return method(self, *args, **kwargs)                                               │
+│   381   return wrapper                                                                           │
+│   382                                                                                            │
+│   383                                                                                            │
+│                                                                                                  │
+│ /home/sr42/.local/lib/python3.8/site-packages/dreamerv3/nets.py:217 in __call__                  │
+│                                                                                                  │
+│   214 │     self._mlp = MLP(None, mlp_layers, mlp_units, dist='none', **mlp_kw)                  │
+│   215                                                                                            │
+│   216   def __call__(self, data):                                                                │
+│ ❱ 217 │   some_key, some_shape = list(self.shapes.items())[0]                                    │
+│   218 │   batch_dims = data[some_key].shape[:-len(some_shape)]                                   │
+│   219 │   data = {                                                                               │
+│   220 │   │   k: v.reshape((-1,) + v.shape[len(batch_dims):])                                    │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
+IndexError: list index out of range

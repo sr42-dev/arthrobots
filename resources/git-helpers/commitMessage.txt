@@ -1,13 +1,15 @@
-test ready to be committed to
-on master
+file restructuring
+on test
 
-next immediate items (publish to test after each item) :
-- implement q learning on single arthrobot simulation
-- implement dreamerv3 on single arthrobot simulation
+next immediate items (to test after each item) :
+- implement q learning on single arthrobot simulation [DONE]
+- implement dreamerv3 on single arthrobot simulation (start with gym-environment file structure)
 - plot rewards vs episodes for all methods
 - implement model saving and deployment for all methods
 - build and test hardware with dreamerv3 (off-repo)
+- multithread for cloud training
 - allocate gpu resources
+- build new world model for testing
 - federate best model
 
 long term milestones (publish to main after each item) :
