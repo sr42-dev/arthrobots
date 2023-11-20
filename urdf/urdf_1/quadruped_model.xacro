@@ -1,4 +1,3 @@
-<?xml version="1.0"?>
 <robot name="quadruped" xmlns:xacro="http://ros.org/wiki/xacro">
   <!-- Gazebo plugin for ROS Control -->
   <gazebo>
