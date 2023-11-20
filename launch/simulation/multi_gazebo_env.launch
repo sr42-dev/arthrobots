@@ -26,6 +26,11 @@
   <param name="robot_description_Robot3" command="$(find xacro)/xacro  $(arg robot3_model)" />
   <param name="robot_description_Robot4" command="$(find xacro)/xacro  $(arg robot4_model)" />
 
+  <rosparam file="$(find quadruped)/config/quadruped_control.yaml" command="load" ns="$(arg robot1_model)"/>
+  <rosparam file="$(find quadruped)/config/quadruped_control.yaml" command="load" ns="$(arg robot2_model)"/>
+  <rosparam file="$(find quadruped)/config/quadruped_control.yaml" command="load" ns="$(arg robot3_model)"/>
+  <rosparam file="$(find quadruped)/config/quadruped_control.yaml" command="load" ns="$(arg robot4_model)"/>
+
   <!-- Launch URDF models for each robot -->
   <group ns="robot1">
     <include file="$(find quadruped)/launch/simulation/one_robot.launch">
@@ -37,6 +42,7 @@
             <arg name="joint_controller_parent" value="quadruped_1/"/>
 
     </include>
+
   </group>
 
   <group ns="robot2">
