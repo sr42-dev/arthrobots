@@ -43,4 +43,6 @@
     <param name="publish_frequency" type="double" value="60.0" />
   </node>
 
+  <node name="Move_bot1" pkg="quadruped" type="src/locomotion/a2c/quadruped_learn.py" output="screen" />
+
 </launch>

@@ -43,6 +43,8 @@
 
     </include>
 
+    <node name="Move_bot1" pkg="quadruped" type="src/locomotion/a2c/quadruped_learn.py" output="screen" />
+
   </group>
 
   <group ns="robot2">
@@ -54,6 +56,9 @@
             <arg name="init_pose" value="-x 5 -y 3 -z 0" />
 
     </include>
+
+    <node name="Move_bot2" pkg="quadruped" type="src/locomotion/ddpg/quadruped_learn.py" output="screen" />
+
   </group>
 
   <group ns="robot3">
@@ -76,4 +81,5 @@
 
     </include>
   </group>
+  
 </launch>

@@ -11,7 +11,7 @@
 
   <!-- Spawn the URDF model in Gazebo -->
   <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model"
-    args="-param robot_description -urdf -model $(arg robot_name)" respawn="false" output="screen" />
+    args="$(arg init_pose) -param robot_description -urdf -model $(arg robot_name)" respawn="false" output="screen" />
 
   <!-- Load controller configurations -->
   <rosparam command="load" file="$(find quadruped)/config/quadruped_control.yaml" ns="$(arg robot_name)"/>
