@@ -26,24 +26,31 @@
   <param name="robot_description_Robot3" command="$(find xacro)/xacro  $(arg robot3_model)" />
   <param name="robot_description_Robot4" command="$(find xacro)/xacro  $(arg robot4_model)" />
 
-  <rosparam file="$(find quadruped)/config/quadruped_control.yaml" command="load" ns="$(arg robot1_model)"/>
-  <rosparam file="$(find quadruped)/config/quadruped_control.yaml" command="load" ns="$(arg robot2_model)"/>
-  <rosparam file="$(find quadruped)/config/quadruped_control.yaml" command="load" ns="$(arg robot3_model)"/>
-  <rosparam file="$(find quadruped)/config/quadruped_control.yaml" command="load" ns="$(arg robot4_model)"/>
+  <rosparam file="$(find quadruped)/config/quadruped_1_control.yaml" command="load" ns="/quadruped_1"/>
+  <rosparam file="$(find quadruped)/config/quadruped_2_control.yaml" command="load" ns="/quadruped_2"/>
+  <rosparam file="$(find quadruped)/config/quadruped_3_control.yaml" command="load" ns="/quadruped_3"/>
+  <rosparam file="$(find quadruped)/config/quadruped_4_control.yaml" command="load" ns="/quadruped_4"/>
 
   <!-- Launch URDF models for each robot -->
   <group ns="robot1">
     <include file="$(find quadruped)/launch/simulation/one_robot.launch">
 
-
             <arg name="robot_name" value="/quadruped_1" />
             <arg name="model" value="$(arg robot1_model)" />
-            <arg name="init_pose" value="-x 1 -y 9 -z 0" />
-            <arg name="joint_controller_parent" value="quadruped_1/"/>
+            <arg name="init_pose" value="-x 1 -y 1 -z 0" />
+            <arg name="joint_controller_parent" value="/quadruped_1"/>
+
+            <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
+            output="screen" ns="/quadruped_1" args="joint_trajectory_controller"/>
+
+          <node pkg="robot_state_publisher" type="robot_state_publisher"  name="robot_state_publisher" respawn="false" output="screen">
+            <remap from="/joint_states" to="/quadruped_1/joint_states" />
+            <param name="publish_frequency" type="double" value="60.0" />
+          </node>
 
     </include>
 
-    <node name="Move_bot1" pkg="quadruped" type="src/locomotion/a2c/quadruped_learn.py" output="screen" />
+    <node name="Move_bot1" pkg="quadruped" type="a2c/quadruped_learn.py" output="screen" />
 
   </group>
 
@@ -53,11 +60,19 @@
 
             <arg name="robot_name" value="/quadruped_2" />
             <arg name="model" value="$(arg robot2_model)" />
-            <arg name="init_pose" value="-x 5 -y 3 -z 0" />
+            <arg name="init_pose" value="-x -1 -y 1 -z 0" />
+
+            <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
+            output="screen" ns="/quadruped_2" args="joint_trajectory_controller"/>
+
+          <node pkg="robot_state_publisher" type="robot_state_publisher"  name="robot_state_publisher" respawn="false" output="screen">
+            <remap from="/joint_states" to="/quadruped_2/joint_states" />
+            <param name="publish_frequency" type="double" value="60.0" />
+          </node>
 
     </include>
 
-    <node name="Move_bot2" pkg="quadruped" type="src/locomotion/ddpg/quadruped_learn.py" output="screen" />
+    <node name="Move_bot2" pkg="quadruped" type="ddpg/quadruped_learn.py" output="screen" />
 
   </group>
 
@@ -67,7 +82,16 @@
 
             <arg name="robot_name" value="/quadruped_3" />
             <arg name="model" value="$(arg robot3_model)" />
-            <arg name="init_pose" value="-x 8 -y 1 -z 0" />
+            <arg name="init_pose" value="-x 1 -y -1 -z 0" />
+
+            <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
+            output="screen" ns="/quadruped_3" args="joint_trajectory_controller"/>
+            
+
+            <node pkg="robot_state_publisher" type="robot_state_publisher"  name="robot_state_publisher" respawn="false" output="screen">
+              <remap from="/joint_states" to="/quadruped_3/joint_states" />
+              <param name="publish_frequency" type="double" value="60.0" />
+            </node>
 
     </include>
   </group>
@@ -77,9 +101,18 @@
 
             <arg name="robot_name" value="/quadruped_4" />
             <arg name="model" value="$(arg robot4_model)" />
-            <arg name="init_pose" value="-x 3 -y 7 -z 0" />
+            <arg name="init_pose" value="-x -1 -y -1 -z 0" />
+
+            <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
+            output="screen" ns="/quadruped_4" args="joint_trajectory_controller"/>
+
+          <node pkg="robot_state_publisher" type="robot_state_publisher"  name="robot_state_publisher" respawn="false" output="screen">
+            <remap from="/joint_states" to="/quadruped_4/joint_states" />
+            <param name="publish_frequency" type="double" value="60.0" />
+          </node>
 
     </include>
   </group>
-  
+
+
 </launch>
