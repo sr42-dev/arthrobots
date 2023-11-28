@@ -22,11 +22,11 @@ class AllJoints:
 
     # joint controller parameters
     def __init__(self,joint_name_lst):
-        self.jta = actionlib.SimpleActionClient('/quadruped_1/joint_trajectory_controller/follow_joint_trajectory', FollowJointTrajectoryAction)
+        self.jta = actionlib.SimpleActionClient('/quadruped/joint_trajectory_controller/follow_joint_trajectory', FollowJointTrajectoryAction)
         rospy.loginfo('Waiting for joint trajectory action')
         self.jta.wait_for_server()
         rospy.loginfo('Found joint trajectory action!')
-        self.jtp = rospy.Publisher('/quadruped_1/joint_trajectory_controller/command',JointTrajectory,queue_size=1)
+        self.jtp = rospy.Publisher('/quadruped/joint_trajectory_controller/command',JointTrajectory,queue_size=1)
         self.joint_name_lst = joint_name_lst
         self.jtp_zeros = np.zeros(len(joint_name_lst))
 
@@ -81,7 +81,7 @@ class AllJoints:
         self.jtp.publish(jtp_msg)
 
 
-# quadruped_1 environment adapter
+# quadruped environment adapter
 class QuadrupedEnvironment:
     
     # environment configuration parameters
@@ -91,11 +91,11 @@ class QuadrupedEnvironment:
         self.nb_links = 13
         self.state_shape = (self.nb_joints * 2 + 4 + 3 + 3,) #joint states + orientation
         self.action_shape = (self.nb_joints,)
-        self.link_name_lst = ['quadruped_1::base_link',
-                             'quadruped_1::front_right_leg1', 'quadruped_1::front_right_leg2', 'quadruped_1::front_right_leg3',
-                             'quadruped_1::front_left_leg1', 'quadruped_1::front_left_leg2', 'quadruped_1::front_left_leg3',
-                             'quadruped_1::back_right_leg1', 'quadruped_1::back_right_leg2', 'quadruped_1::back_right_leg3',
-                             'quadruped_1::back_left_leg1', 'quadruped_1::back_left_leg2', 'quadruped_1::back_left_leg3']
+        self.link_name_lst = ['quadruped::base_link',
+                             'quadruped::front_right_leg1', 'quadruped::front_right_leg2', 'quadruped::front_right_leg3',
+                             'quadruped::front_left_leg1', 'quadruped::front_left_leg2', 'quadruped::front_left_leg3',
+                             'quadruped::back_right_leg1', 'quadruped::back_right_leg2', 'quadruped::back_right_leg3',
+                             'quadruped::back_left_leg1', 'quadruped::back_left_leg2', 'quadruped::back_left_leg3']
         self.leg_link_name_lst = self.link_name_lst[1:]
         self.joint_name_lst = ['front_right_leg1_joint', 'front_right_leg2_joint', 'front_right_leg3_joint',
                                'front_left_leg1_joint', 'front_left_leg2_joint', 'front_left_leg3_joint',
@@ -111,14 +111,14 @@ class QuadrupedEnvironment:
         self.unpause_proxy = rospy.ServiceProxy('/gazebo/unpause_physics',Empty)
         self.model_config_proxy = rospy.ServiceProxy('/gazebo/set_model_configuration',SetModelConfiguration)
         self.model_config_req = SetModelConfigurationRequest()
-        self.model_config_req.model_name = 'quadruped_1'
+        self.model_config_req.model_name = 'quadruped'
         self.model_config_req.urdf_param_name = 'robot_description'
         self.model_config_req.joint_names = self.joint_name_lst
         self.model_config_req.joint_positions = self.starting_pos
         self.model_state_proxy = rospy.ServiceProxy('/gazebo/set_model_state',SetModelState)
         self.model_state_req = SetModelStateRequest()
         self.model_state_req.model_state = ModelState()
-        self.model_state_req.model_state.model_name = 'quadruped_1'
+        self.model_state_req.model_state.model_name = 'quadruped'
         self.model_state_req.model_state.pose.position.x = 0.0
         self.model_state_req.model_state.pose.position.y = 0.0
         self.model_state_req.model_state.pose.position.z = 0.25
@@ -136,7 +136,7 @@ class QuadrupedEnvironment:
 
         self.get_model_state_proxy = rospy.ServiceProxy('/gazebo/get_model_state',GetModelState)
         self.get_model_state_req = GetModelStateRequest()
-        self.get_model_state_req.model_name = 'quadruped_1'
+        self.get_model_state_req.model_name = 'quadruped'
         self.get_model_state_req.relative_entity_name = 'world'
         self.last_pos = np.zeros(3)
         self.last_ori = np.zeros(4)
@@ -154,12 +154,12 @@ class QuadrupedEnvironment:
         self.joint_pos_mid = (self.joint_pos_high + self.joint_pos_low) / 2.0
         self.joint_pos = self.starting_pos
         self.joint_state = np.zeros(self.nb_joints)
-        self.joint_state_subscriber = rospy.Subscriber('/quadruped_1/joint_states',JointState,
+        self.joint_state_subscriber = rospy.Subscriber('/quadruped/joint_states',JointState,
                                                        self.joint_state_subscriber_callback)
         self.orientation = np.zeros(4)
         self.angular_vel = np.zeros(3)
         self.linear_acc = np.zeros(3)
-        self.imu_subscriber = rospy.Subscriber('/quadruped_1/imu',Imu,
+        self.imu_subscriber = rospy.Subscriber('/quadruped/imu',Imu,
                                                        self.imu_subscriber_callback)
         self.normed_sp = self.normalize_joint_state(self.starting_pos)
         self.state = np.zeros(self.state_shape)
