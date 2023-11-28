@@ -55,9 +55,9 @@ for i in range(max_episode):
         curr_highest_eps_reward = eps_reward
     if cutoff_count >= save_cutoff:
         save_count += 1
-        # print('saving_model at episode:',i)
-        # agent.save_model()
-        # agent.save_memory()
+        print('saving_model at episode:',i)
+        agent.save_model()
+        agent.save_memory()
         cutoff_count = 0
     observation, done = env.reset()
 np.save('eps_rewards',tot_rewards)
