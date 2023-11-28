@@ -17,6 +17,7 @@
     <arg name="paused" value="false"/>
     <arg name="use_sim_time" value="true"/>
     <arg name="headless" value="false"/>
+
   </include>
 
   <!-- Load robot descriptions -->
@@ -43,14 +44,15 @@
             <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
             output="screen" ns="/quadruped_1" args="joint_trajectory_controller"/>
 
-          <node pkg="robot_state_publisher" type="robot_state_publisher"  name="robot_state_publisher" respawn="false" output="screen">
-            <remap from="/joint_states" to="/quadruped_1/joint_states" />
-            <param name="publish_frequency" type="double" value="60.0" />
-          </node>
+            <node pkg="robot_state_publisher" type="robot_state_publisher"  name="robot_state_publisher" respawn="false" output="screen">
+              <remap from="/joint_states" to="/quadruped_1/joint_states" />
+              <param name="publish_frequency" type="double" value="60.0" />
+            </node>
+
+            <node name="move_robot1" pkg="quadruped" type="quadruped_learn_ddpg.py" output="screen" />
 
     </include>
 
-    <node name="Move_bot1" pkg="quadruped" type="a2c/quadruped_learn.py" output="screen" />
 
   </group>
 
@@ -65,14 +67,14 @@
             <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
             output="screen" ns="/quadruped_2" args="joint_trajectory_controller"/>
 
-          <node pkg="robot_state_publisher" type="robot_state_publisher"  name="robot_state_publisher" respawn="false" output="screen">
-            <remap from="/joint_states" to="/quadruped_2/joint_states" />
-            <param name="publish_frequency" type="double" value="60.0" />
-          </node>
+            <node pkg="robot_state_publisher" type="robot_state_publisher"  name="robot_state_publisher" respawn="false" output="screen">
+              <remap from="/joint_states" to="/quadruped_2/joint_states" />
+              <param name="publish_frequency" type="double" value="60.0" />
+            </node>
+
+            <node name="move_robot2" pkg="quadruped" type="quadruped_learn_a2c.py" output="screen" />
 
     </include>
-
-    <node name="Move_bot2" pkg="quadruped" type="ddpg/quadruped_learn.py" output="screen" />
 
   </group>
 
@@ -106,13 +108,12 @@
             <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
             output="screen" ns="/quadruped_4" args="joint_trajectory_controller"/>
 
-          <node pkg="robot_state_publisher" type="robot_state_publisher"  name="robot_state_publisher" respawn="false" output="screen">
-            <remap from="/joint_states" to="/quadruped_4/joint_states" />
-            <param name="publish_frequency" type="double" value="60.0" />
-          </node>
+            <node pkg="robot_state_publisher" type="robot_state_publisher"  name="robot_state_publisher" respawn="false" output="screen">
+              <remap from="/joint_states" to="/quadruped_4/joint_states" />
+              <param name="publish_frequency" type="double" value="60.0" />
+            </node>
 
     </include>
   </group>
-
 
 </launch>
