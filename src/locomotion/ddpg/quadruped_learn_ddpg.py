@@ -20,7 +20,7 @@ agent = DDPG(state_shape,action_shape,batch_size=128,gamma=0.995,tau=0.001, acto
 print('DDPG agent configured')
 
 # training parameters
-max_episode = 10000
+max_episode = 2
 tot_rewards = []
 
 # environment reset

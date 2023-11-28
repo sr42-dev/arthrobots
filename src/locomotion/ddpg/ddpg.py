@@ -290,11 +290,13 @@ class DDPG:
 
     # save model weights
     def save_model(self):
-        self.saver.save(self.sess,self.current_path + '/model/model.ckpt')
+        save_path = self.saver.save(self.sess, self.current_path + '/model/model.pth')
+        print("Model saved in path: %s" % save_path)
 
     # load model weights
-    def load_model(self,path):
-        self.saver.restore(self.sess,path)
+    def load_model(self, path):
+        self.saver.restore(self.sess, path)
+        print("Model restored.")
 
     # save agent memory
     def save_memory(self):

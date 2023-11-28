@@ -1,2 +1,2 @@
-model_checkpoint_path: "/home/rohan/catkin_ws/src/arthrobots_git/quadruped/src/locomotion/ddpg/model/model.ckpt"
-all_model_checkpoint_paths: "/home/rohan/catkin_ws/src/arthrobots_git/quadruped/src/locomotion/ddpg/model/model.ckpt"
+model_checkpoint_path: "/home/rohan/catkin_ws/src/arthrobots_git/quadruped/src/locomotion/ddpg/model/model.pth"
+all_model_checkpoint_paths: "/home/rohan/catkin_ws/src/arthrobots_git/quadruped/src/locomotion/ddpg/model/model.pth"
