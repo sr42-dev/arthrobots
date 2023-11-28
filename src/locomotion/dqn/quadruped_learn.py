@@ -58,7 +58,7 @@ def collect_gameplay_experiences(env, agent, buffer):
         state = next_state
 
 
-def train_model(max_episodes=50000):
+def train_model(max_episodes=2):
     """
     Trains a DQN agent to play the quadruped game by trial and error
 
@@ -72,7 +72,7 @@ def train_model(max_episodes=50000):
 
     agent = DQN(state_shape, action_shape)
 
-    for _ in range(100):
+    for _ in range(1):
         collect_gameplay_experiences(env, agent, buffer)
     for episode_cnt in range(max_episodes):
         collect_gameplay_experiences(env, agent, buffer)
@@ -82,6 +82,9 @@ def train_model(max_episodes=50000):
         print('Episode : {0}/{1}, Reward : {2}, loss : {3}'.format(episode_cnt, max_episodes, avg_reward, loss[0]))
         if episode_cnt % 20 == 0:
             agent.update_target_network()
+    
+    agent.save_model()
+    agent.save_memory()
     env.close()
 
 

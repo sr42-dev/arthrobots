@@ -52,6 +52,15 @@ class ReplayBuffer:
             reward_batch.append(gameplay_experience[2])
             action_batch.append(gameplay_experience[3])
             done_batch.append(gameplay_experience[4])
+
+            print(gameplay_experience)
+
+            print([np.shape(state) for state in state_batch])
+            print([np.shape(state) for state in next_state_batch])
+            print([np.shape(action) for action in action_batch])
+            print([np.shape(reward) for reward in reward_batch])
+            print([np.shape(done) for done in done_batch])
+
         return np.array(state_batch), np.array(next_state_batch), np.array(
             action_batch), np.array(reward_batch), np.array(done_batch)
 
@@ -154,3 +163,19 @@ class DQN:
         training_history = self.q_net.fit(x=state_batch, y=target_q, verbose=0)
         loss = training_history.history['loss']
         return loss
+
+    def save_model(self):
+        self.q_net.save_weights(self.current_path + '/model/q_net.ckpt')
+        self.target_q_net.save_weights(self.current_path + '/model/target_q_net.ckpt')
+
+    def load_model(self, q_net_path, target_q_net_path):
+        self.q_net.load_weights(q_net_path)
+        self.target_q_net.load_weights(target_q_net_path)
+
+    def save_memory(self):
+        with open(self.current_path + '/agent_mem.p', 'wb') as f:
+            pickle.dump(self.buffer, f)
+
+    def load_memory(self, path):
+        with open(path, 'rb') as f:
+            self.buffer = pickle.load(f)
