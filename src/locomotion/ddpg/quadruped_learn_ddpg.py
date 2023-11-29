@@ -4,6 +4,7 @@ from quadruped_env import QuadrupedEnvironment
 from ddpg import OUNoise, DDPG
 import numpy as np
 import os
+import time
 
 # a script to initiate training of the quadruped robot on any currently published simulation environment
 
@@ -21,7 +22,7 @@ agent = DDPG(state_shape,action_shape,batch_size=128,gamma=0.995,tau=0.001, acto
 print('DDPG agent configured')
 
 # training parameters
-max_episode = 2
+max_episode = 1
 tot_rewards = []
 
 # environment reset
@@ -60,11 +61,13 @@ for i in range(max_episode):
     # take step
     action, eps_reward = agent.step(observation, reward, done)
 
-    while os.path.exists('rewards.lock'):
-        time.sleep(0.01)
+    # print("Checking for lock file...")
+    # while os.path.exists('rewards.lock'):
+    #     time.sleep(0.01)
+    # print("Lock file not found, continuing...")
 
-    with open('rewards.lock', 'w'):
-        pass
+    # with open('rewards.lock', 'w'):
+    #     pass
 
     with open('rewards.txt', 'r+') as f:
         existing_rewards = f.read()
@@ -75,7 +78,8 @@ for i in range(max_episode):
     os.remove('rewards.lock')
 
     with open('rewards.txt', 'r') as f:
-        averaged_reward = float(f.read()) / 4
+        rewards = [float(line) for line in f]
+        averaged_reward = sum(rewards) / len(rewards) / 4
 
     tot_rewards.append(averaged_reward)
 
