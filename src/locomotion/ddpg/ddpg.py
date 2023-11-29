@@ -1,8 +1,12 @@
 import numpy as np
 import tensorflow as tf
+tf.compat.v1.enable_eager_execution()
+tf.config.run_functions_eagerly(True)
 import time
 import os
 import pickle
+
+
 
 class ReplayBuffer:
 
@@ -102,9 +106,10 @@ class A2C:
         self.actor_and_critic_target = self.critic_net(self.input_state_target,
                                                        self.actor_target, name='target_critic',use_layer_norm=self.use_layer_norm)
 
-        self.actor_loss, self.critic_loss = self.set_model_loss(self.critic, self.actor_and_critic,
+        self.actor_loss, self.critic_loss, self.q_targets = self.set_model_loss(self.critic, self.actor_and_critic,
                                                                 self.actor_target, self.actor_and_critic_target,
                                                                 self.rewards, self.dones, self.gamma)
+        print("************\n",self.q_targets)
 
         self.actor_opt, self.critic_opt = self.set_model_opt(self.actor_loss, self.critic_loss,
                                                              self.actor_lr, self.critic_lr)
@@ -161,10 +166,24 @@ class A2C:
     # helper to set loss function
     def set_model_loss(self, critic, actor_and_critic, actor_target, actor_and_critic_target, rewards, dones, gamma):
         Q_targets = rewards + (gamma * actor_and_critic_target) * (1. - dones)
+     
+        with open('targets.txt','w') as f:
+            f.write(str(Q_targets))
+                
         actor_loss = tf.reduce_mean(-actor_and_critic)
         tf.compat.v1.losses.add_loss(actor_loss)
         critic_loss = tf.compat.v1.losses.huber_loss(Q_targets,critic)
-        return actor_loss, critic_loss
+
+        return actor_loss, critic_loss, Q_targets
+
+    def read_losses(self):
+        with open('losses.txt', 'r') as f:
+            lines = f.readlines()
+            # Read the losses as integers
+            actor_losses = [int(line.split(': ')[1]) for line in lines if line.startswith('Actor loss')]
+            critic_losses = [int(line.split(': ')[1]) for line in lines if line.startswith('Critic loss')]
+        # Return the average of the losses
+        return sum(actor_losses) / len(actor_losses), sum(critic_losses) / len(critic_losses)
 
     # helper to set optimizer 
     def set_model_opt(self, actor_loss, critic_loss, actor_lr, critic_lr):
@@ -175,6 +194,17 @@ class A2C:
             actor_opt = tf.compat.v1.train.AdamOptimizer(actor_lr).minimize(actor_loss, var_list=actor_vars)
             critic_opt = tf.compat.v1.train.AdamOptimizer(critic_lr).minimize(critic_loss, var_list=critic_vars)
         return actor_opt, critic_opt    
+
+    # def set_model_opt(self, actor_loss, critic_loss, actor_lr, critic_lr):
+    #     # actor_loss, critic_loss = self.read_losses()
+
+    #     train_vars = tf.compat.v1.trainable_variables()
+    #     actor_vars = [var for var in train_vars if var.name.startswith('actor')]
+    #     critic_vars = [var for var in train_vars if var.name.startswith('critic')]
+    #     with tf.control_dependencies(tf.compat.v1.get_collection(tf.compat.v1.GraphKeys.UPDATE_OPS)):
+    #         actor_opt = tf.compat.v1.train.AdamOptimizer(actor_lr).minimize(actor_loss, var_list=actor_vars)
+    #         critic_opt = tf.compat.v1.train.AdamOptimizer(critic_lr).minimize(critic_loss, var_list=critic_vars)
+    #     return actor_opt, critic_opt
 
 
 class DDPG:
