@@ -3,6 +3,7 @@ from __future__ import print_function
 from quadruped_env import QuadrupedEnvironment
 from ddpg import OUNoise, DDPG
 import numpy as np
+import os
 
 # a script to initiate training of the quadruped robot on any currently published simulation environment
 
@@ -58,7 +59,25 @@ for i in range(max_episode):
     
     # take step
     action, eps_reward = agent.step(observation, reward, done)
-    tot_rewards.append(eps_reward)
+
+    while os.path.exists('rewards.lock'):
+        time.sleep(0.01)
+
+    with open('rewards.lock', 'w'):
+        pass
+
+    with open('rewards.txt', 'r+') as f:
+        existing_rewards = f.read()
+        total_reward = sum(float(r) for r in existing_rewards.split()) + eps_reward
+        f.seek(0)
+        f.write(str(total_reward) + '\n')
+
+    os.remove('rewards.lock')
+
+    with open('rewards.txt', 'r') as f:
+        averaged_reward = float(f.read()) / 4
+
+    tot_rewards.append(averaged_reward)
 
     # cutoff conditions
     if eps_reward > curr_highest_eps_reward:
