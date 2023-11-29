@@ -1,4 +1,6 @@
-<<<<<<< HEAD
+src/locomotion/ddpg/model
+
+
 .vscode
 .ipynb_checkpoints
 .pytest_cache
@@ -61,14 +63,4 @@ qtcreator-*
 
 # Catkin custom files
 CATKIN_IGNORE
-=======
-**/.vscode/
-**/__pycache__/
-**/.ipynb_checkpoints/
-
-
-.vscode
-__pycache__
-.ipynb_checkpoints
->>>>>>> origin/multi_spawn
 
