@@ -49,7 +49,7 @@
               <param name="publish_frequency" type="double" value="60.0" />
             </node>
 
-            <node name="move_robot1" pkg="quadruped" type="quadruped_learn_ddpg.py" output="screen" />
+            <node name="move_robot1" pkg="quadruped" type="quadruped_learn_ddpg_1.py" output="screen" />
 
     </include>
 
@@ -72,7 +72,7 @@
               <param name="publish_frequency" type="double" value="60.0" />
             </node>
 
-            <node name="move_robot2" pkg="quadruped" type="quadruped_learn_a2c.py" output="screen" />
+            <node name="move_robot2" pkg="quadruped" type="quadruped_learn_ddpg_2.py" output="screen" />
 
     </include>
 
@@ -95,6 +95,8 @@
               <param name="publish_frequency" type="double" value="60.0" />
             </node>
 
+            <node name="move_robot3" pkg="quadruped" type="quadruped_learn_ddpg_3.py" output="screen" />
+
     </include>
   </group>
 
@@ -112,6 +114,8 @@
               <remap from="/joint_states" to="/quadruped_4/joint_states" />
               <param name="publish_frequency" type="double" value="60.0" />
             </node>
+
+            <node name="move_robot4" pkg="quadruped" type="quadruped_learn_ddpg_4.py" output="screen" />
 
     </include>
   </group>
