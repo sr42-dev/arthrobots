@@ -1,6 +1,10 @@
 MIT License
 
+<<<<<<< HEAD
 Copyright (c) 2023 Sriram Radhakrishna
+=======
+Copyright (c) 2018 YunjaeChoi
+>>>>>>> origin/multi_spawn
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
