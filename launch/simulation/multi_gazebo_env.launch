@@ -13,7 +13,7 @@
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
     <arg name="world_name" value="$(find quadruped)/worlds/final_four_q_warehouse.world"/>
     <arg name="debug" value="false" />
-    <arg name="gui" value="true" />
+    <arg name="gui" value="false" />
     <arg name="paused" value="false"/>
     <arg name="use_sim_time" value="true"/>
     <arg name="headless" value="false"/>
