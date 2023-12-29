@@ -22,7 +22,7 @@ agent = DDPG(state_shape,action_shape,batch_size=128,gamma=0.995,tau=0.001, acto
 print('DDPG agent configured')
 
 # training parameters
-max_episode = 1
+max_episode = 5
 tot_rewards = []
 
 # environment reset
@@ -38,8 +38,12 @@ cutoff_count = 0
 save_count = 0
 curr_highest_eps_reward = -1000.0
 
+epoch_count = []
+
 # training loop
 for i in range(max_episode):
+
+    epoch_count.append(i)
 
     # introducing noise
     if i % 100 == 0 and noise_sigma>0.03:
@@ -75,11 +79,11 @@ for i in range(max_episode):
         f.seek(0)
         f.write(str(total_reward) + '\n')
 
-    os.remove('rewards.lock')
+    # os.remove('rewards.lock')
 
     with open('rewards.txt', 'r') as f:
-        rewards = [float(line) for line in f]
-        averaged_reward = sum(rewards) / len(rewards) / 4
+        rewards = [float(line) for line in f if line.strip()]
+        averaged_reward = sum(rewards) / len(rewards) / 1
 
     tot_rewards.append(averaged_reward)
 
@@ -103,5 +107,7 @@ np.save('eps_rewards',tot_rewards)
 
 # plot rewards
 import matplotlib.pyplot as plt
-plt.plot(tot_rewards)
-# plt.show()
+plt.plot(epoch_count,tot_rewards)
+plt.xlabel('Epochs')
+plt.ylabel('Total Rewards')
+plt.show()
