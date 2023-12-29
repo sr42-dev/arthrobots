@@ -22,8 +22,9 @@ agent = DDPG(state_shape,action_shape,batch_size=128,gamma=0.995,tau=0.001, acto
 print('DDPG agent configured')
 
 # training parameters
-max_episode = 10000
+max_episode = 10
 tot_rewards = []
+epoch_count = []
 
 # environment reset
 print('env reset')
@@ -40,6 +41,8 @@ curr_highest_eps_reward = -1000.0
 
 # training loop
 for i in range(max_episode):
+
+    epoch_count.append(i)
 
     # introducing noise
     if i % 100 == 0 and noise_sigma>0.03:
@@ -103,5 +106,7 @@ np.save('eps_rewards',tot_rewards)
 
 # plot rewards
 import matplotlib.pyplot as plt
-plt.plot(tot_rewards)
-# plt.show()
+plt.plot(epoch_count,tot_rewards)
+plt.xlabel('Epochs')
+plt.ylabel('Total Rewards')
+plt.show()
