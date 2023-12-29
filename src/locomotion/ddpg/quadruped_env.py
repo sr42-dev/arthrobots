@@ -254,7 +254,7 @@ class QuadrupedEnvironment:
 
         self.reward = self.reward_coeff * (pos[1] - self.last_pos[1] - np.sqrt((pos[0]-self.last_pos[0])**2))
         print('pos reward:', self.reward)
-        self.reward -=  0.75 * np.sqrt(np.sum((self.orientation)**2))
+        self.reward +=  0.75 * np.sqrt(np.sum((self.orientation)**2))
 
         normed_js = self.normalize_joint_state(self.joint_state)
         #self.reward -= 0.25 * np.sqrt(np.sum((self.normed_sp - normed_js)**2))
@@ -274,7 +274,7 @@ class QuadrupedEnvironment:
             self.reset()
         elif(model_state.pose.position.z < self.pos_z_limit):
             done = False
-            self.reward += -1.0
+            self.reward += 1.0
         else:
             done = False
         print('state',self.state)
