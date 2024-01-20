@@ -169,10 +169,14 @@ class QuadrupedEnvironment:
         self.done = False
         self.episode_start_time = 0.0
         self.max_sim_time = 15.0
-        self.pos_z_limit = 0.18
-        self.action_coeff = 1.0
+        self.pos_z_limit = 0.3
+        self.action_coeff = 1.2
         self.linear_acc_coeff = 0.1
         self.last_action = np.zeros(self.nb_joints)
+
+        self.ground_penalty_coeff = 0.9
+        self.movement_reward_coeff = 1
+        self.joint_positions_penalty_coeff = 1
 
     # helper to normalize joint state value
     def normalize_joint_state(self,joint_pos):
@@ -252,12 +256,14 @@ class QuadrupedEnvironment:
         model_state = self.get_model_state_proxy(self.get_model_state_req)
         pos = np.array([model_state.pose.position.x, model_state.pose.position.y, model_state.pose.position.z])
 
-        self.reward = self.reward_coeff * (pos[1] - self.last_pos[1] - np.sqrt((pos[0]-self.last_pos[0])**2))
+        # Reward for moving along the y-axis
+        self.reward = self.reward_coeff * (pos[1] - self.last_pos[1])
         print('pos reward:', self.reward)
-        self.reward +=  0.75 * np.sqrt(np.sum((self.orientation)**2))
+
+        # Penalty for rotation
+        self.reward -=  0.75 * np.sqrt(np.sum((self.orientation)**2))
 
         normed_js = self.normalize_joint_state(self.joint_state)
-        #self.reward -= 0.25 * np.sqrt(np.sum((self.normed_sp - normed_js)**2))
 
         diff_joint = self.diff_state_coeff * (normed_js - self.last_joint)
 
@@ -267,14 +273,24 @@ class QuadrupedEnvironment:
         self.last_pos = pos
         self.last_action = action
 
+        # Penalty for not maintaining the z-axis limit
+        if model_state.pose.position.z < self.pos_z_limit:
+            self.reward -= self.ground_penalty_coeff
+        ground_penalty = -self.ground_penalty_coeff * model_state.pose.position.z
+        self.reward += ground_penalty
+
+        action_magnitude = np.sum(np.abs(action))
+        movement_reward = self.movement_reward_coeff * action_magnitude
+        self.reward += movement_reward
+
+        joint_positions_penalty = -self.joint_positions_penalty_coeff * np.sum(np.abs(self.joint_pos - (self.joint_pos_high + self.joint_pos_low) / 2))
+        self.reward += joint_positions_penalty
+
         curr_time = rospy.get_time()
         print('time:',curr_time - self.episode_start_time)
         if (curr_time - self.episode_start_time) > self.max_sim_time:
             done = True
             self.reset()
-        elif(model_state.pose.position.z < self.pos_z_limit):
-            done = False
-            self.reward += 1.0
         else:
             done = False
         print('state',self.state)

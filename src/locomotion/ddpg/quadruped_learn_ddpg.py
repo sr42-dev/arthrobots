@@ -22,7 +22,7 @@ agent = DDPG(state_shape,action_shape,batch_size=128,gamma=0.995,tau=0.001, acto
 print('DDPG agent configured')
 
 # training parameters
-max_episode = 10
+max_episode = 5
 tot_rewards = []
 
 # environment reset
@@ -32,11 +32,11 @@ observation, done = env.reset()
 # state and action space configuration
 action = agent.act(observation)
 observation, reward, done = env.step(action)
-noise_sigma = 0.15
+noise_sigma = 0.001
 save_cutoff = 1
 cutoff_count = 0
 save_count = 0
-curr_highest_eps_reward = 100.0
+curr_highest_eps_reward = -100.0
 
 epoch_count = []
 
