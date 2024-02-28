@@ -7,7 +7,6 @@ import os
 import pickle
 
 
-
 class ReplayBuffer:
 
     def __init__(self, maxlen, action_shape, state_shape, dtype=np.float32):
