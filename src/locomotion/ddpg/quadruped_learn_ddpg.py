@@ -73,6 +73,9 @@ for i in range(max_episode):
     # with open('rewards.lock', 'w'):
     #     pass
 
+    if not os.path.isfile('rewards.txt'):
+        open('rewards.txt', 'w').close()
+
     with open('rewards.txt', 'r+') as f:
         existing_rewards = f.read()
         total_reward = sum(float(r) for r in existing_rewards.split()) + eps_reward
@@ -106,8 +109,8 @@ for i in range(max_episode):
 np.save('eps_rewards',tot_rewards)
 
 # plot rewards
-import matplotlib.pyplot as plt
-plt.plot(epoch_count,tot_rewards)
-plt.xlabel('Epochs')
-plt.ylabel('Total Rewards')
-plt.show()
+# import matplotlib.pyplot as plt
+# plt.plot(epoch_count,tot_rewards)
+# plt.xlabel('Epochs')
+# plt.ylabel('Total Rewards')
+# plt.show()

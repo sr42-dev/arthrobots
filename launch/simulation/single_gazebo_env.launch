@@ -8,7 +8,7 @@
   <!--arg name="model" default="$(find quadruped)/urdf/simple_model.xacro" /-->
   <arg name="paused" default="false"/>
   <arg name="use_sim_time" default="true"/>
-  <arg name="gui" default="true"/>
+  <arg name="gui" default="false"/>
   <arg name="headless" default="false"/>
   <arg name="debug" default="false"/>
 
@@ -42,5 +42,7 @@
     <remap from="/joint_states" to="/quadruped/joint_states" />
     <param name="publish_frequency" type="double" value="60.0" />
   </node>
+
+  <node name="quadruped_learn_ddpg" pkg="quadruped" type="quadruped_learn_ddpg.py" output="screen"/>
 
 </launch>
